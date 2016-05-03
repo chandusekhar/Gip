@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MaasOne.Finance.YahooFinance;
 
 namespace Gip
 {
@@ -23,7 +24,12 @@ namespace Gip
         public MainWindow()
         {
             InitializeComponent();
-            ReadExcel.update();
+            List<Stock> Results = new List<Stock>();
+            List<string> Ticks = new List<string>();
+
+            Ticks = GetData.TickerstoGet();
+
+            Results = GetData.Try2(Ticks);
         }
     }
 }
