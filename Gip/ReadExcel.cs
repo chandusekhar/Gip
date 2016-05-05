@@ -98,6 +98,14 @@ namespace Gip
             return ReturnTicks;
         }
 
+        public static List<string> testTicker()
+        {
+            string Tick ="CBA.AX" ;
+            List<string> testTick = new List<string>();
+            testTick.Add(Tick);
+            return testTick;
+        }
+
         public static List<Stock> Try2(List<string> Ticks)
         {
             List<Stock> Market = new List<Stock>();
@@ -127,6 +135,7 @@ namespace Gip
                 }
 
                 TempStock.Ticker = v;
+                TempStock.SortDates();
                 Market.Add(TempStock);
             }
 
