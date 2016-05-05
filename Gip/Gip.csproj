@@ -75,21 +75,37 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="LumenWorks.Framework.IO, Version=3.8.2.0, Culture=neutral, PublicKeyToken=5ad3ea2f85776344, processorArchitecture=MSIL">
       <HintPath>..\packages\LumenWorksCsvReader.3.8.2\lib\net20\LumenWorks.Framework.IO.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MaasOne">
-      <HintPath>..\..\..\..\Desktop\Desktop\AnyCPU\MaasOne.dll</HintPath>
+      <HintPath>..\..\..\..\Downloads\Release 0.11.2.0\Desktop\AnyCPU\MaasOne.dll</HintPath>
     </Reference>
     <Reference Include="MaasOne.Microsoft">
-      <HintPath>..\..\..\..\Desktop\Desktop\AnyCPU\MaasOne.Microsoft.dll</HintPath>
+      <HintPath>..\..\..\..\Downloads\Release 0.11.2.0\Desktop\AnyCPU\MaasOne.Microsoft.dll</HintPath>
     </Reference>
     <Reference Include="MaasOne.Yahoo">
-      <HintPath>..\..\..\..\Desktop\Desktop\AnyCPU\MaasOne.Yahoo.dll</HintPath>
+      <HintPath>..\..\..\..\Downloads\Release 0.11.2.0\Desktop\AnyCPU\MaasOne.Yahoo.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data">
+      <HintPath>..\..\KicoCad2\KICoCAD\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\..\..\..\Dropbox\System.Data.SQLite.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -112,6 +128,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DatabaseContext.cs" />
     <Compile Include="ReadExcel.cs" />
     <Compile Include="Stock.cs" />
     <Page Include="MainWindow.xaml">

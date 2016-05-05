@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Data.Entity;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 
 namespace Gip
 {
-    public class Stock
+
+    public class Stock 
     {
+        [Key]
         public string Ticker { get; set; }
         public List<TradingDay> History { get; set; }
         public double SSTO { get; set; }
@@ -104,6 +110,7 @@ namespace Gip
 
     public class TradingDay
     {
+        [Key]
         public DateTime TradeDate { get; set; }
         public double OpeningPrice { get; set; }
         public double ClosingPrice { get; set; }
@@ -119,7 +126,7 @@ namespace Gip
             TradeDate = date;
             OpeningPrice = open;
             ClosingPrice = close;
-            DailyChange = ((close - open) / open) * 100;
+            if (PrevClose > 0) DailyChange = ((PrevClose - ClosingPrice) / PrevClose) * 100;
         }
         public TradingDay(DateTime date, double open, double close, double high, double low)
         {
@@ -128,7 +135,7 @@ namespace Gip
             ClosingPrice = close;
             High = high;
             Low = low;
-            DailyChange = ((close - open) / open) * 100;
+            if (PrevClose > 0) DailyChange = ((PrevClose - ClosingPrice) / PrevClose) * 100;
         }
         public TradingDay(DateTime date, double open, double close, double high, double low, double AdjCl, double PrCl, double volume)
         {
@@ -140,7 +147,7 @@ namespace Gip
             AdjustedClose = AdjCl;
             PrevClose = PrCl;
             Volume = volume;
-            DailyChange = ((PrevClose - ClosingPrice) / PrevClose) * 100;
+            if(PrevClose>0) DailyChange = ((PrevClose - ClosingPrice) / PrevClose) * 100;
         }
     }
 }
