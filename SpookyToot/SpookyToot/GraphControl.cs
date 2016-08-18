@@ -53,7 +53,7 @@ namespace SpookyToot
             bool naturalY = false;
             bool naturalV = false;
 
-            var pm = new PlotModel { Title = Stckname };
+            var pm = new PlotModel {  };
 
             var series = new CandleStickAndVolumeSeries
             {
@@ -66,13 +66,13 @@ namespace SpookyToot
                 VolumeStyle = VolumeStyle.Combined
             };
 
-
+    
             // create bars
             foreach (var v in Stck.OrderBy(x => x.Day.Ticks))
             {
                 OhlcvItem Temp = new OhlcvItem();
                 Temp.BuyVolume = (v.Volume / 10000);
-                Temp.Close = v.AdjClose;
+                Temp.Close = v.Close;
                 Temp.High = v.High;
                 Temp.Low = v.Low;
                 Temp.Open = v.Open;
@@ -96,14 +96,15 @@ namespace SpookyToot
                 Minimum = Xmin,
                 Maximum = Xmax
             };
-            var barAxis = new OxyPlot.Axes. LogarithmicAxis
+            var barAxis = new OxyPlot.Axes.LogarithmicAxis
             {
                 Position = AxisPosition.Left,
                 Key = series.BarAxisKey,
                 StartPosition = 0.25,
                 EndPosition = 1.0,
                 Minimum = naturalY ? double.NaN : Ymin,
-                Maximum = naturalY ? double.NaN : Ymax
+                Maximum = naturalY ? double.NaN : Ymax,
+               
             };
             var volAxis = new OxyPlot.Axes.LinearAxis
             {
