@@ -1,16 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Linq;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Office.Interop.Excel;
-using Microsoft.Office.Core;
-using System.Data.SqlClient;
-using System.Data.SQLite;
-using System.Data.Linq.Mapping;
-using MaasOne;
 using MaasOne.Base;
 using MaasOne.Finance;
 using MaasOne.Finance.YahooFinance;
@@ -20,72 +9,6 @@ namespace Gip
 {
     public static class GetData
     {
-        public static object ExcelObject { get; set; }
-
-
-        //public static void updateThruExcel()
-        //{
-        //    var Excel = new Microsoft.Office.Interop.Excel.Application();
-        //    var Data = Excel.Workbooks.Open(@"C:\Users\Ben Roberts\Dropbox\Misc\Portfolio\Data.xlsm");
-        //    int count = 0;
-        //    List<Stock> Market = new List<Stock>();
-
-        //    for (int i = 2; i < Data.Worksheets.Count + 1; i++)
-        //    {
-
-        //        Worksheet currentSheet = Data.Sheets[i];
-
-        //        Stock Temp = new Stock();
-        //        Temp.History = new List<TradingDay>();
-
-        //        Temp.Ticker = currentSheet.Name;
-
-        //        Range excelRange = currentSheet.UsedRange;
-
-
-        //        object[,] valueArray = (object[,])excelRange.get_Value(XlRangeValueDataType.xlRangeValueDefault);
-
-        //        for (int x = 3; x < valueArray.GetLength(0) + 1; x++)
-        //        {
-
-        //            DateTime Date = Convert.ToDateTime(valueArray[x, 1]);
-        //            double open = Convert.ToDouble(valueArray[x, 2]);
-        //            double high = Convert.ToDouble(valueArray[x, 3]);
-        //            double low = Convert.ToDouble(valueArray[x, 4]);
-        //            double close = Convert.ToDouble(valueArray[x, 5]);
-        //            double volume = Convert.ToDouble(valueArray[x, 6]);
-
-        //            if (open == 0 || high == 0 || low == 0 || close == 0 || volume == 0) count++;
-
-        //            TradingDay TempDay = new TradingDay(Date, open, close, high, low, volume);
-
-        //            Temp.History.Add(TempDay);
-        //        }
-
-        //        int sum = count;
-        //    }
-        //}
-
-        //public static void GetTickers2()
-        //{
-        //    MaasOne.Finance.YahooFinance.I
-
-        //    MaasOne.Finance.YahooFinance.AlphabeticIDIndexDownload t = new AlphabeticIDIndexDownload();
-        //    DownloadClient<AlphabeticIDIndexResult> baset = t;
-
-        //    AlphabeticIDIndexSettings settings = t.Settings;
-        //    settings.TopIndex = null;
-
-        //    Response<AlphabeticIDIndexResult> Resp = t.Download();
-
-        //    List<string> Tickers = new List<string>();
-        //    foreach (var hqc in Resp.Result.Items)
-        //    {
-        //        Tickers.Add(hqc.Index);
-
-        //    }
-        //    Tickers.Add("t");
-        //}
 
         public static List<string> TickerstoGet()
         {
@@ -136,78 +59,78 @@ namespace Gip
             return ReturnTicks;
         }
 
-        public static List<string> testTicker()
+        public static string[] testTicker()
         {
-            string Tick = "CBA.AX";
-            List<string> testTick = new List<string>();
-            testTick.Add(Tick);
-            return testTick;
+            string[] Tick = { "CBA.AX", "BHP.AX" };
+
+            return Tick;
         }
 
-        public static List<Stock> Try2(List<string> Ticks)
+        public static List<TradingDay> DownloadStocks(List<string> Ticks, DateTime From)
         {
-            List<Stock> Market = new List<Stock>();
+            List<TradingDay> Market = new List<TradingDay>();
+            int c = 1;
 
 
+            HistQuotesDownload dl = new HistQuotesDownload();
 
+            dl.Settings.IDs = Ticks.ToArray();
+            dl.Settings.FromDate = From;
+            dl.Settings.ToDate = DateTime.Today;
+            dl.Settings.Interval = HistQuotesInterval.Daily;
 
-            foreach (var v in Ticks)
+            Response<HistQuotesResult> resp = dl.Download();
+
+            foreach (HistQuotesDataChain hqc in resp.Result.Chains)
             {
-                Stock TempStock = new Stock();
-                TempStock.History = new List<TradingDay>();
 
-                HistQuotesDownload dl = new HistQuotesDownload();
-
-                dl.Settings.IDs = new string[] {v};
-                dl.Settings.FromDate = new DateTime(2010, 1, 1);
-                dl.Settings.ToDate = DateTime.Today;
-                dl.Settings.Interval = HistQuotesInterval.Daily;
-
-                Response<HistQuotesResult> resp = dl.Download();
-
-                foreach (HistQuotesDataChain hqc in resp.Result.Chains)
+                foreach (HistQuotesData hqd in hqc)
                 {
-          
-                    foreach (HistQuotesData hqd in hqc)
-                    {
-                        TradingDay tempday = new TradingDay(hqd.TradingDate.ToLocalTime(), hqd.Open, hqd.Close, hqd.High,
-                            hqd.Low, hqd.CloseAdjusted, hqd.PreviousClose, hqd.Volume);
-                        TempStock.History.Add(tempday);
-   
-                    }
+                    TradingDay tempday = new TradingDay(hqc.ID, c, hqd.TradingDate.ToLocalTime(), hqd.Open, hqd.Close,
+                        hqd.High,
+                        hqd.Low, hqd.CloseAdjusted, hqd.PreviousClose, (int)hqd.Volume);
 
+                    c++;
+                    Market.Add(tempday);
                 }
-
-                TempStock.Ticker = v;
-                TempStock.SortDates();
-                Market.Add(TempStock);
             }
 
             return Market;
         }
 
-        public static StockContext CreateDB(List<Stock> Stocks)
+
+    
+
+    public static List<TradingDay> DownloadStocksUsingString(string Ticks, DateTime From)
+    {
+        List<TradingDay> Market = new List<TradingDay>();
+        int c = 1;
+
+        HistQuotesDownload dl = new HistQuotesDownload();
+
+        dl.Settings.IDs = new string[] { Ticks };
+        dl.Settings.FromDate = From;
+        dl.Settings.ToDate = DateTime.Today;
+        dl.Settings.Interval = HistQuotesInterval.Daily;
+
+        Response<HistQuotesResult> resp = dl.Download();
+
+        foreach (HistQuotesDataChain hqc in resp.Result.Chains)
         {
 
-                var tab = new StockContext();
-            foreach (var c in Stocks)
+            foreach (HistQuotesData hqd in hqc)
             {
-                tab.Technicals.Attach(c);
+                TradingDay tempday = new TradingDay(hqc.ID, c, hqd.TradingDate.ToLocalTime(), hqd.Open, hqd.Close,
+                    hqd.High,
+                    hqd.Low, hqd.CloseAdjusted, hqd.PreviousClose, (int)hqd.Volume);
 
-                foreach (var x in c.History)
-                {
-
-                    tab.MarketHistory.Attach(x);
-
-
-                }
-
+                c++;
+                Market.Add(tempday);
             }
-
-                tab.SaveChanges();
-
-
-            return tab;
         }
+
+        return Market;
     }
+}
+
 }
