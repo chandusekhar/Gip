@@ -25,5 +25,13 @@ namespace SpookyToot
             InitializeComponent();
 
         }
+
+        private void WeeklyView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Space)
+            {
+                WeeklyMonthlyView.SetBinding(,new Binding( "ModelViewMonthly"));
+            }
+        }
     }
 }

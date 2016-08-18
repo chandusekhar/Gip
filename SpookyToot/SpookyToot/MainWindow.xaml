@@ -12,12 +12,12 @@
     </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50*"/>
             <RowDefinition Height=" 50*"/>
             <RowDefinition Height="50*"/>
         </Grid.RowDefinitions>
-        <oxy:PlotView x:Name="DailyView" Model="{Binding ModelViewDaily.Model}" Controller="{Binding ModelViewDaily.Controller }" Grid.Row="2" />
-        <oxy:PlotView x:Name="WeeklyView" Model="{Binding ModelViewWeekly.Model}" Controller="{Binding ModelViewWeekly.Controller }" Grid.Row="1" />
-        <oxy:PlotView x:Name="MonthlyView" Model="{Binding ModelViewMonthly.Model}" Controller="{Binding ModelViewMonthly.Controller }" Grid.Row="0" />
+        <oxy:PlotView x:Name="DailyView" Model="{Binding ModelViewDaily.Model}" Controller="{Binding ModelViewDaily.Controller }" Grid.Row="0" />
+        <oxy:PlotView x:Name="WeeklyMonthlyView" Model="{Binding ModelViewWeekly.Model}" Controller="{Binding ModelViewWeekly.Controller }" Grid.Row="1" KeyDown="WeeklyView_KeyDown"/>
+
     </Grid>
+    
 </Window>

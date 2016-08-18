@@ -96,7 +96,7 @@ namespace SpookyToot
                 Minimum = Xmin,
                 Maximum = Xmax
             };
-            var barAxis = new OxyPlot.Axes.LogarithmicAxis
+            var barAxis = new OxyPlot.Axes.LinearAxis
             {
                 Position = AxisPosition.Left,
                 Key = series.BarAxisKey,
@@ -240,7 +240,7 @@ namespace SpookyToot
             return new Example(pm, controller);
         }
 
-        private static void AdjustYExtent(CandleStickAndVolumeSeries series, OxyPlot.Axes.DateTimeAxis xaxis, OxyPlot.Axes.LogarithmicAxis yaxis)
+        private static void AdjustYExtent(CandleStickAndVolumeSeries series, OxyPlot.Axes.DateTimeAxis xaxis, OxyPlot.Axes.LinearAxis yaxis)
         {
             var xmin = xaxis.ActualMinimum;
             var xmax = xaxis.ActualMaximum;
