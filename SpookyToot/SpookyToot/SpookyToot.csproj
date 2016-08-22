@@ -117,7 +117,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\New OxyPlot References\OxyPlot.Wpf.dll</HintPath>
     </Reference>
-    <Reference Include="OxyPlot.Xps">
+    <Reference Include="OxyPlot.Xps, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\New OxyPlot References\OxyPlot.Xps.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -143,6 +144,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="GraphControl.cs" />
+    <Compile Include="MarketStructures.cs" />
     <Compile Include="StockStructures.cs" />
     <Compile Include="YahooApiInterface.cs" />
     <Page Include="MainWindow.xaml">

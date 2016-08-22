@@ -58,6 +58,8 @@ namespace SpookyToot
         public List<TradingPeriod> MonthlyHist { get; set; }
         public string StockName { get; set; }
 
+       
+
         public void GetPivots(Stock.Interval Period)
         {
             List<TradingPeriod> TempList = new List<TradingPeriod>();
@@ -90,7 +92,7 @@ namespace SpookyToot
                 if (TempList[i].High > TempList[i - 1].High && TempList[i].High > TempList[i + 1].High)
                 {
                     Hist[Hist.IndexOf(TempList[i])].IsPivotHigh[1] = true;
-                    Hist[Hist.IndexOf(TempList[i])].IsPivotHigh[0] = false;
+                    //Hist[Hist.IndexOf(TempList[i])].IsPivotHigh[0] = false;
                  }
             }
 
@@ -101,7 +103,7 @@ namespace SpookyToot
                 if (TempList[i].High > TempList[i - 1].High && TempList[i].High > TempList[i + 1].High)
                 {
                     Hist[Hist.IndexOf(TempList[i])].IsPivotHigh[2] = true;
-                    Hist[Hist.IndexOf(TempList[i])].IsPivotHigh[1] = false;
+                    //Hist[Hist.IndexOf(TempList[i])].IsPivotHigh[1] = false;
                  }
             }
 
@@ -112,7 +114,7 @@ namespace SpookyToot
                 if (TempList[i].Low < TempList[i - 1].Low && TempList[i].Low < TempList[i + 1].Low)
                 {
                     Hist[Hist.IndexOf(TempList[i])].IsPivotLow[1] = true;
-                    Hist[Hist.IndexOf(TempList[i])].IsPivotLow[0] = false;
+                    //Hist[Hist.IndexOf(TempList[i])].IsPivotLow[0] = false;
                 }
             }
 
@@ -123,7 +125,7 @@ namespace SpookyToot
                 if (TempList[i].Low < TempList[i - 1].Low && TempList[i].Low < TempList[i + 1].Low)
                 {
                     Hist[Hist.IndexOf(TempList[i])].IsPivotLow[2] = true;
-                    Hist[Hist.IndexOf(TempList[i])].IsPivotLow[1] = false;
+                    //Hist[Hist.IndexOf(TempList[i])].IsPivotLow[1] = false;
                 }
             }
 

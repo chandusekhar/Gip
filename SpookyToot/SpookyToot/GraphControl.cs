@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using OxyPlot.Annotations;
 using FontWeights = OxyPlot.FontWeights;
 
 
@@ -107,7 +106,9 @@ namespace SpookyToot
             {
                 Position = AxisPosition.Bottom,
                 Minimum = Xmin,
-                Maximum = Xmax
+                Maximum = Xmax,
+                //StartPosition = Xmax - TimeSpan.FromDays(180).Ticks,
+                //EndPosition = Xmax,
             };
             var barAxis = new OxyPlot.Axes.LogarithmicAxis()
             {
@@ -281,7 +282,7 @@ namespace SpookyToot
                     // Modify the end point
                     tmp.EndPoint = timeAxis.InverseTransform(e.Position.X, e.Position.Y, barAxis);
                     tmp.FontWeight = FontWeights.Bold;
-                    tmp.Text = string.Format("{0:0.##}%", ((tmp.EndPoint.Y - tmp.StartPoint.Y) * 100) / tmp.EndPoint.Y);
+                    tmp.Text = string.Format("{0:0.##}%", ((tmp.StartPoint.Y - tmp.EndPoint.Y) * -100) / tmp.StartPoint.Y);
 
                     // Redraw the plot
                     pm.InvalidatePlot(false);
@@ -297,6 +298,15 @@ namespace SpookyToot
                     e.Handled = true;
                 }
             };
+
+            List<OxyPlot.Annotations.LineAnnotation> A = new List<OxyPlot.Annotations.LineAnnotation> ();
+            A.AddRange(MarketStructure.DefineSupportResistanceZones(Stck));
+            
+            foreach(var c in A)
+            {
+                
+                pm.Annotations.Add(c);
+            }
 
             var controller = new PlotController();
 
@@ -325,14 +335,7 @@ namespace SpookyToot
                 ymax = Math.Max(ymax, bar.High);
             }
 
-            //ymin = 0.09545484566*Math.Exp(0.465168705655*xmin);
-            //ymax = 0.09545484566 * Math.Exp(0.465168705655 * xmax);
-
-
-            var extent = ymax - ymin;
-            var margin = extent * 0.10;
-
-            yaxis.Zoom(ymin - margin, ymax + margin);
+            yaxis.Zoom(ymin * (0.935), ymax / (0.935));
         }
     }
     }
