@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using OxyPlot;
+using OxyPlot.Wpf;
 
 namespace SpookyToot
 {
@@ -20,6 +22,8 @@ namespace SpookyToot
     /// </summary>
     public partial class MainWindow : Window
     {
+        private bool WeekShowing = true;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -28,10 +32,23 @@ namespace SpookyToot
 
         private void WeeklyView_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.Key == Key.Space)
+            if (e.Key == Key.Space)
             {
-                WeeklyMonthlyView.SetBinding(,new Binding( "ModelViewMonthly"));
+                if (WeekShowing)
+                {
+                    WeekShowing = false;
+                    WeeklyMonthlyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewMonthly.Model"));
+                }
+                else
+                {
+                    WeeklyMonthlyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewWeekly.Model"));
+                    WeekShowing = true;
+                }
+                WeeklyMonthlyView.Model.InvalidatePlot(true);
+
             }
         }
+
+
     }
 }

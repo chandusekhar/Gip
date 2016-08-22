@@ -1,13 +1,20 @@
 ﻿using System;
+using System.CodeDom;
 using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.Axes;
+using OxyPlot.Annotations;
 using OxyPlot.Wpf;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using OxyPlot.Annotations;
+using FontWeights = OxyPlot.FontWeights;
 
 
 namespace SpookyToot
@@ -18,9 +25,16 @@ namespace SpookyToot
         public Example ModelViewWeekly { get; private set; }
         public Example ModelViewMonthly{ get; private set; }
 
+        //public bool SOPChecked
+        //{
+        //    get { return (bool)GetValue(SOPCheckedProperty); }
+        //    set { SetValue(SOPCheckedProperty, value); }
+        //}
+
+        //public static readonly DependencyProperty SOPCheckedProperty = DependencyProperty.Register("SOPChecked", typeof(bool), typeof(CheckBox), new UIPropertyMetadata(false));
+
         public GraphControl()
         {
-
 
             YahooApiInterface T = new YahooApiInterface();
             List<Stock> SGH = new List<Stock>( T.getYahooData(new List<string>() { "SGH.AX" }, new DateTime(2014, 01, 01)));
@@ -28,7 +42,6 @@ namespace SpookyToot
             ModelViewDaily = GenerateGraph(SGH[0].StockName, SGH[0].DailyHist);
             ModelViewWeekly = GenerateGraph(SGH[0].StockName, SGH[0].WeeklyHist);
             ModelViewMonthly = GenerateGraph(SGH[0].StockName, SGH[0].MonthlyHist);
-
 
         }
 
@@ -71,7 +84,7 @@ namespace SpookyToot
             foreach (var v in Stck.OrderBy(x => x.Day.Ticks))
             {
                 OhlcvItem Temp = new OhlcvItem();
-                Temp.BuyVolume = (v.Volume / 10000);
+                Temp.BuyVolume = (v.Volume);
                 Temp.Close = v.Close;
                 Temp.High = v.High;
                 Temp.Low = v.Low;
@@ -96,7 +109,7 @@ namespace SpookyToot
                 Minimum = Xmin,
                 Maximum = Xmax
             };
-            var barAxis = new OxyPlot.Axes.LinearAxis
+            var barAxis = new OxyPlot.Axes.LogarithmicAxis()
             {
                 Position = AxisPosition.Left,
                 Key = series.BarAxisKey,
@@ -106,7 +119,7 @@ namespace SpookyToot
                 Maximum = naturalY ? double.NaN : Ymax,
                
             };
-            var volAxis = new OxyPlot.Axes.LinearAxis
+            var volAxis = new OxyPlot.Axes.LinearAxis()
             {
                 Position = AxisPosition.Left,
                 Key = series.VolumeAxisKey,
@@ -145,9 +158,64 @@ namespace SpookyToot
             if (naturalY == false)
             {
                 timeAxis.AxisChanged += (sender, e) => AdjustYExtent(series, timeAxis, barAxis);
+                //timeAxis.AxisChanged += (sender, e) => AdjustYExtent(series, timeAxis, volAxis);
             }
 
+            ///Adding Pivot Annotation
+            /// 
+
+            var FirstOrderHighPivots = new List<OxyPlot.Annotations.PointAnnotation>();
+            var SecondOrderHighPivots = new List<OxyPlot.Annotations.PointAnnotation>();
+            var ThirdOrderHighPivots = new List<OxyPlot.Annotations.PointAnnotation>();
+            var FirstOrderLowPivots = new List<OxyPlot.Annotations.PointAnnotation>();
+            var SeconfOrderLowPivots = new List<OxyPlot.Annotations.PointAnnotation>();
+            var ThirdOrderLowPivots = new List<OxyPlot.Annotations.PointAnnotation>();
+
+            foreach (var f in Stck)
+            {
+                //if(f.IsPivotHigh[0]) FirstOrderHighPivots.Add(new OxyPlot.Annotations.PointAnnotation() {Fill = OxyColors.LawnGreen , X = f.Day.Ticks, Y = f.High});
+                if (f.IsPivotHigh[1]) SecondOrderHighPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Green, X = f.Day.Ticks, Y = f.High });
+                if (f.IsPivotHigh[2]) ThirdOrderHighPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.DarkGreen, X = f.Day.Ticks, Y = f.High });
+                //if (f.IsPivotLow[0]) FirstOrderLowPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Pink, X = f.Day.Ticks, Y = f.Low });
+                if (f.IsPivotLow[1]) SeconfOrderLowPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Red, X = f.Day.Ticks, Y = f.Low });
+                if (f.IsPivotLow[2]) ThirdOrderLowPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.DarkRed, X = f.Day.Ticks, Y = f.Low });
+            }
+
+            foreach (var p in FirstOrderHighPivots)
+            {
+            pm.Annotations.Add(p);
+                }
+
+            foreach (var p in SecondOrderHighPivots)
+            {
+                pm.Annotations.Add(p);
+            }
+            foreach (var p in ThirdOrderHighPivots)
+            {
+                pm.Annotations.Add(p);
+
+            }
+            foreach (var p in FirstOrderLowPivots)
+            {
+                pm.Annotations.Add(p);
+
+            }
+            foreach (var p in SeconfOrderLowPivots)
+            {
+                pm.Annotations.Add(p);
+
+            }
+            foreach (var p in ThirdOrderLowPivots)
+            {
+                pm.Annotations.Add(p);
+
+            }
+
+
+
             ///Adding line annotation...
+
+
 
             var la = new OxyPlot.Annotations.LineAnnotation { Type = LineAnnotationType.Horizontal, Y = Stck.Last().Close };
             la.MouseDown += (s, e) =>
@@ -240,7 +308,7 @@ namespace SpookyToot
             return new Example(pm, controller);
         }
 
-        private static void AdjustYExtent(CandleStickAndVolumeSeries series, OxyPlot.Axes.DateTimeAxis xaxis, OxyPlot.Axes.LinearAxis yaxis)
+        private static void AdjustYExtent(CandleStickAndVolumeSeries series, OxyPlot.Axes.DateTimeAxis xaxis, OxyPlot.Axes.LogarithmicAxis yaxis)
         {
             var xmin = xaxis.ActualMinimum;
             var xmax = xaxis.ActualMaximum;
@@ -250,12 +318,16 @@ namespace SpookyToot
 
             var ymin = double.MaxValue;
             var ymax = double.MinValue;
-            for (int i = istart; i <= iend; i++)
+            for (int i = istart; i < iend - 1; i++)
             {
                 var bar = series.Items[i];
                 ymin = Math.Min(ymin, bar.Low);
                 ymax = Math.Max(ymax, bar.High);
             }
+
+            //ymin = 0.09545484566*Math.Exp(0.465168705655*xmin);
+            //ymax = 0.09545484566 * Math.Exp(0.465168705655 * xmax);
+
 
             var extent = ymax - ymin;
             var margin = extent * 0.10;

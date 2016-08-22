@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.IO;
 using System.Text;
@@ -17,8 +18,15 @@ namespace SpookyToot
         public double AdjClose { get; set; }
         public long Volume { get; set; }
 
+        public List<bool> IsPivotHigh { get; set; }
+        public List<bool> IsPivotLow { get; set; }
+
+
         public TradingPeriod(DateTime day, double high, double low, double open, double close, double adjclose, long volume)
         {
+            IsPivotHigh = new List<bool>(){false, false,false,false};
+            IsPivotLow = new List<bool>() {false, false, false, false};
+
             Day = day;
             High = high;
             Low = low;
@@ -30,7 +38,8 @@ namespace SpookyToot
 
         public TradingPeriod()
         {
-
+            IsPivotHigh = new List<bool>() { false, false, false, false };
+            IsPivotLow = new List<bool>() { false, false, false, false };
         }
 
     }
@@ -48,6 +57,91 @@ namespace SpookyToot
         public List<TradingPeriod> WeeklyHist { get; set; }
         public List<TradingPeriod> MonthlyHist { get; set; }
         public string StockName { get; set; }
+
+        public void GetPivots(Stock.Interval Period)
+        {
+            List<TradingPeriod> TempList = new List<TradingPeriod>();
+            List<TradingPeriod> Hist = new List<TradingPeriod>();
+
+            switch (Period)
+            {
+                    case Interval.Day:
+                    Hist = DailyHist;
+                    break;
+                    case Interval.Week:
+                    Hist = WeeklyHist;
+                    break;
+                    case Interval.Month:
+                    Hist = MonthlyHist;
+                    break;
+            }
+
+
+            for (int i = 1; i < Hist.Count -1; i++)
+            {
+                if (Hist[i].High > Hist[i - 1].High && Hist[i].High > Hist[i + 1].High) Hist[i].IsPivotHigh[0] = true;
+                if (Hist[i].Low < Hist[i - 1].Low && Hist[i].Low < Hist[i + 1].Low) Hist[i].IsPivotLow[0] = true;
+            }
+
+            TempList = Hist.Where(x => x.IsPivotHigh[0]).ToList();
+
+            for (int i = 1; i < TempList.Count - 1; i++)
+            {
+                if (TempList[i].High > TempList[i - 1].High && TempList[i].High > TempList[i + 1].High)
+                {
+                    Hist[Hist.IndexOf(TempList[i])].IsPivotHigh[1] = true;
+                    Hist[Hist.IndexOf(TempList[i])].IsPivotHigh[0] = false;
+                 }
+            }
+
+            TempList = Hist.Where(x => x.IsPivotHigh[1]).ToList();
+
+            for (int i = 1; i < TempList.Count - 1; i++)
+            {
+                if (TempList[i].High > TempList[i - 1].High && TempList[i].High > TempList[i + 1].High)
+                {
+                    Hist[Hist.IndexOf(TempList[i])].IsPivotHigh[2] = true;
+                    Hist[Hist.IndexOf(TempList[i])].IsPivotHigh[1] = false;
+                 }
+            }
+
+            TempList = Hist.Where(x => x.IsPivotLow[0]).ToList();
+
+            for (int i = 1; i < TempList.Count - 1; i++)
+            {
+                if (TempList[i].Low < TempList[i - 1].Low && TempList[i].Low < TempList[i + 1].Low)
+                {
+                    Hist[Hist.IndexOf(TempList[i])].IsPivotLow[1] = true;
+                    Hist[Hist.IndexOf(TempList[i])].IsPivotLow[0] = false;
+                }
+            }
+
+            TempList = Hist.Where(x => x.IsPivotLow[1]).ToList();
+
+            for (int i = 1; i < TempList.Count - 1; i++)
+            {
+                if (TempList[i].Low < TempList[i - 1].Low && TempList[i].Low < TempList[i + 1].Low)
+                {
+                    Hist[Hist.IndexOf(TempList[i])].IsPivotLow[2] = true;
+                    Hist[Hist.IndexOf(TempList[i])].IsPivotLow[1] = false;
+                }
+            }
+
+            switch (Period)
+            {
+                case Interval.Day:
+                    DailyHist = Hist;
+                    break;
+                case Interval.Week:
+                    WeeklyHist = Hist;
+                    break;
+                case Interval.Month:
+                    MonthlyHist = Hist;
+                    break;
+            }
+
+
+        }
 
         public void BuildStockHist(StreamReader YahooData, string Ticker, Stock.Interval Period)
         {
@@ -91,6 +185,9 @@ namespace SpookyToot
 
                         DailyHist.Add(TmpDay);
                     }
+
+                    GetPivots(Interval.Day);
+
                     break;
 
                 case Interval.Week:
@@ -131,6 +228,8 @@ namespace SpookyToot
 
                         WeeklyHist.Add(TmpWeek);
                     }
+                    GetPivots(Interval.Week);
+                    
                     break;
 
                 case Interval.Month:
@@ -171,6 +270,8 @@ namespace SpookyToot
 
                         MonthlyHist.Add(TmpWeek);
                     }
+                    GetPivots(Interval.Month);
+
                     break;
             }
 
