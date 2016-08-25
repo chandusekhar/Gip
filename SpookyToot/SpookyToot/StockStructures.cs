@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.IO;
+using System.ComponentModel;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -188,8 +189,6 @@ namespace SpookyToot
                         DailyHist.Add(TmpDay);
                     }
 
-                    GetPivots(Interval.Day);
-
                     break;
 
                 case Interval.Week:
@@ -230,7 +229,6 @@ namespace SpookyToot
 
                         WeeklyHist.Add(TmpWeek);
                     }
-                    GetPivots(Interval.Week);
                     
                     break;
 
@@ -272,7 +270,7 @@ namespace SpookyToot
 
                         MonthlyHist.Add(TmpWeek);
                     }
-                    GetPivots(Interval.Month);
+
 
                     break;
             }

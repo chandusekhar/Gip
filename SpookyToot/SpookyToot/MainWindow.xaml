@@ -31,25 +31,12 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <CheckBox Content="{Binding Name}"  IsChecked="{Binding Show}" ></CheckBox>
+                    <CheckBox Content="{Binding Name}"  IsChecked="{Binding Show}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" ></CheckBox>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
 
 
-        <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">
-            <CheckBox Name="FOP" IsChecked="False" HorizontalAlignment="Center" VerticalContentAlignment="Center"   FontSize="22" Margin="0 20">
-                <AccessText TextAlignment="Center" Text="First Order Pivots" TextWrapping="Wrap"></AccessText>
-            </CheckBox>
-            <CheckBox Name="SOP" IsChecked="{Binding ElementName = SOPChecked, Path=SOPChecked}" HorizontalAlignment="Center" VerticalContentAlignment="Center"  FontSize="22" Margin="0 20">
-                <AccessText TextAlignment="Center" Text ="Second Order Pivots" TextWrapping="Wrap"></AccessText>
-            </CheckBox>
-            <CheckBox Name="TOP" IsChecked="False" HorizontalAlignment="Center" VerticalContentAlignment="Center"  FontSize="22" Margin=" 0 20">
-                <AccessText TextAlignment="Center" Text="Third Order Pivots" TextWrapping="Wrap"/>
-            </CheckBox>
-        </StackPanel>
-        
-        
     </Grid>
     
 </Window>

@@ -49,6 +49,91 @@ namespace SpookyToot
             }
         }
 
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
 
+            var a = ((CheckBox)sender).DataContext as GraphOverlays;
+            if (a != null)
+            {
+                var b = this.DataContext as GraphControl;
+
+                if (a.Period == Stock.Interval.Day)
+                {
+                    var c = a.Overlay as List<OxyPlot.Annotations.PointAnnotation>;
+                    foreach (var t in c)
+                    {
+                        b.ModelViewDaily.Model.Annotations.Add(t);
+                    }
+                    DailyView.Model.InvalidatePlot(true);
+                }
+                if (a.Period == Stock.Interval.Week)
+                {
+                    var c = a.Overlay as List<OxyPlot.Annotations.PointAnnotation>;
+                    foreach (var t in c)
+                    {
+                        b.ModelViewWeekly.Model.Annotations.Add(t);
+                    }
+                    WeeklyMonthlyView.Model.InvalidatePlot(true);
+
+                }
+                if (a.Period == Stock.Interval.Month)
+                {
+                    var c = a.Overlay as List<OxyPlot.Annotations.PointAnnotation>;
+                    foreach (var t in c)
+                    {
+                        b.ModelViewMonthly.Model.Annotations.Add(t);
+                    }
+                    WeeklyMonthlyView.Model.InvalidatePlot(true);
+
+                }
+
+            }
+
+        }
+
+        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            var a = ((CheckBox)sender).DataContext as GraphOverlays;
+            if (a != null)
+            {
+                var b = this.DataContext as GraphControl;
+
+                if (a.Period == Stock.Interval.Day)
+                {
+                    var c = a.Overlay as List<OxyPlot.Annotations.PointAnnotation>;
+                    foreach (var t in c)
+                    {
+                        b.ModelViewDaily.Model.Annotations.Remove(t);
+                    }
+                    DailyView.Model.InvalidatePlot(true);
+
+                }
+                if (a.Period == Stock.Interval.Week)
+                {
+                    var c = a.Overlay as List<OxyPlot.Annotations.PointAnnotation>;
+                    foreach (var t in c)
+                    {
+                        b.ModelViewWeekly.Model.Annotations.Remove(t);
+                    }
+                    WeeklyMonthlyView.Model.InvalidatePlot(true);
+
+                }
+                if (a.Period == Stock.Interval.Month)
+                {
+                    var c = a.Overlay as List<OxyPlot.Annotations.PointAnnotation>;
+                    foreach (var t in c)
+                    {
+                        b.ModelViewMonthly.Model.Annotations.Remove(t);
+                    }
+                    WeeklyMonthlyView.Model.InvalidatePlot(true);
+
+                }
+
+
+            }
+
+
+        }
     }
 }
+

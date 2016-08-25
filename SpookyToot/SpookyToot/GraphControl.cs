@@ -7,6 +7,7 @@ using OxyPlot.Annotations;
 using OxyPlot.Wpf;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,27 +26,19 @@ namespace SpookyToot
         public Example ModelViewMonthly{ get; private set; }
         public Stock CurrentStock { get; private set; }
 
-        public List<GraphOverlays> CurrentOverlays { get; private set; }
-
-
-        //public bool SOPChecked
-        //{
-        //    get { return (bool)GetValue(SOPCheckedProperty); }
-        //    set { SetValue(SOPCheckedProperty, value); }
-        //}
-
-        //public static readonly DependencyProperty SOPCheckedProperty = DependencyProperty.Register("SOPChecked", typeof(bool), typeof(CheckBox), new UIPropertyMetadata(false));
+        public ObservableCollection<GraphOverlays> CurrentOverlays { get; private set; }
 
         public GraphControl()
         {
             YahooApiInterface T = new YahooApiInterface();
-            List<Stock> SGH = new List<Stock>( T.getYahooData(new List<string>() { "SGH.AX" }, new DateTime(2014, 01, 01)));
+            List<Stock> SGH = new List<Stock>( T.getYahooData(new List<string>() { "AVL.AX" }, new DateTime(2014, 01, 01)));
 
             CurrentStock = SGH[0];
 
-            ModelViewDaily = GenerateGraph(CurrentStock.StockName, CurrentStock.DailyHist);
-            ModelViewWeekly = GenerateGraph(CurrentStock.StockName, CurrentStock.WeeklyHist);
-            ModelViewMonthly = GenerateGraph(CurrentStock.StockName, CurrentStock.MonthlyHist);
+            CurrentOverlays = new ObservableCollection<GraphOverlays>();
+            ModelViewDaily = GenerateGraph(CurrentStock, Stock.Interval.Day);
+            ModelViewWeekly = GenerateGraph(CurrentStock, Stock.Interval.Week);
+            ModelViewMonthly = GenerateGraph(CurrentStock, Stock.Interval.Month);
         }
 
 
@@ -61,9 +54,26 @@ namespace SpookyToot
             public PlotModel Model { get; private set; }
         }
 
-        public Example GenerateGraph(string Stckname, List<TradingPeriod> Stck)
+        public Example GenerateGraph(Stock Stck, Stock.Interval Period)
         {
-            int length = Stck.Count;
+            int length = 0;
+            List<TradingPeriod> TradingList = new List<TradingPeriod>();
+            switch (Period)
+            {
+                case Stock.Interval.Day:
+                    length = Stck.DailyHist.Count;
+                    TradingList = Stck.DailyHist;
+                    break;
+                case Stock.Interval.Week:
+                    length = Stck.WeeklyHist.Count;
+                    TradingList = Stck.WeeklyHist;
+                    break;
+                case Stock.Interval.Month:
+                    length = Stck.MonthlyHist.Count;
+                    TradingList = Stck.MonthlyHist;
+                    break;
+            }
+
             VolumeStyle style = VolumeStyle.Combined;
             bool naturalY = false;
             bool naturalV = false;
@@ -83,7 +93,7 @@ namespace SpookyToot
 
     
             // create bars
-            foreach (var v in Stck.OrderBy(x => x.Day.Ticks))
+            foreach (var v in TradingList.OrderBy(x => x.Day.Ticks))
             {
                 OhlcvItem Temp = new OhlcvItem();
                 Temp.BuyVolume = (v.Volume);
@@ -130,7 +140,7 @@ namespace SpookyToot
                 StartPosition = 0.0,
                 EndPosition = 0.22,
                 Minimum = naturalV ? double.NaN : 0,
-                Maximum = naturalV ? double.NaN : 5000
+                Maximum = naturalV ? double.NaN : TradingList.Max(x => x.Volume)
             };
 
             switch (style)
@@ -167,78 +177,46 @@ namespace SpookyToot
 
             ///Adding Pivot Annotation
             /// 
+            Stck.GetPivots(Period);
 
-            var FirstOrderHighPivots = new List<OxyPlot.Annotations.PointAnnotation>();
-            var SecondOrderHighPivots = new List<OxyPlot.Annotations.PointAnnotation>();
-            var ThirdOrderHighPivots = new List<OxyPlot.Annotations.PointAnnotation>();
-            var FirstOrderLowPivots = new List<OxyPlot.Annotations.PointAnnotation>();
-            var SeconfOrderLowPivots = new List<OxyPlot.Annotations.PointAnnotation>();
-            var ThirdOrderLowPivots = new List<OxyPlot.Annotations.PointAnnotation>();
+            var FirstOrderPivots = new List<OxyPlot.Annotations.PointAnnotation>();
+            var SecondOrderPivots = new List<OxyPlot.Annotations.PointAnnotation>();
+            var ThirdOrderPivots = new List<OxyPlot.Annotations.PointAnnotation>();
 
-            foreach (var f in Stck)
+            foreach (var f in TradingList)
             {
-                if (f.IsPivotHigh[0]) FirstOrderHighPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.LawnGreen, X = f.Day.Ticks, Y = f.High });
-                if (f.IsPivotHigh[1]) SecondOrderHighPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Green, X = f.Day.Ticks, Y = f.High });
-                if (f.IsPivotHigh[2]) ThirdOrderHighPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.DarkGreen, X = f.Day.Ticks, Y = f.High });
-                if (f.IsPivotLow[0]) FirstOrderLowPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Pink, X = f.Day.Ticks, Y = f.Low });
-                if (f.IsPivotLow[1]) SeconfOrderLowPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Red, X = f.Day.Ticks, Y = f.Low });
-                if (f.IsPivotLow[2]) ThirdOrderLowPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.DarkRed, X = f.Day.Ticks, Y = f.Low });
+                if (f.IsPivotHigh[0]) FirstOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.LawnGreen, X = f.Day.Ticks, Y = f.High });
+                if (f.IsPivotHigh[1]) SecondOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Green, X = f.Day.Ticks, Y = f.High });
+                if (f.IsPivotHigh[2]) ThirdOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.DarkGreen, X = f.Day.Ticks, Y = f.High });
+                if (f.IsPivotLow[0]) FirstOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Pink, X = f.Day.Ticks, Y = f.Low });
+                if (f.IsPivotLow[1]) SecondOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Red, X = f.Day.Ticks, Y = f.Low });
+                if (f.IsPivotLow[2]) ThirdOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.DarkRed, X = f.Day.Ticks, Y = f.Low });
             }
-
 
             GraphOverlays FOP = new GraphOverlays();
+            GraphOverlays SOP = new GraphOverlays();
+            GraphOverlays TOP = new GraphOverlays();
+
             FOP.Name = "First Order Pivot";
-            FOP.Show = false;
+            SOP.Name = "Second Order Pivot";
+            TOP.Name = "Third Order Pivot";
 
-            this.CurrentOverlays.Add(new GraphOverlays());
+            FOP.Overlay = FirstOrderPivots;
+            SOP.Overlay = SecondOrderPivots;
+            TOP.Overlay = ThirdOrderPivots;
 
+            FOP.Period = Period;
+            SOP.Period = Period;
+            TOP.Period = Period;
 
-            if (ShowFOP)
-            {
-                foreach (var p in FirstOrderHighPivots)
-                {
-                    pm.Annotations.Add(p);
-                }
-                foreach (var p in FirstOrderLowPivots)
-                {
-                    pm.Annotations.Add(p);
-
-                }
-            }
-            if (ShowSOP)
-            {
-                foreach (var p in SecondOrderHighPivots)
-                {
-                    pm.Annotations.Add(p);
-                }
-
-                foreach (var p in SeconfOrderLowPivots)
-                {
-                    pm.Annotations.Add(p);
-
-                }
-            }
-            if (ShowTOP)
-            {
-
-                foreach (var p in ThirdOrderHighPivots)
-                {
-                    pm.Annotations.Add(p);
-
-                }
-
-                foreach (var p in ThirdOrderLowPivots)
-                {
-                    pm.Annotations.Add(p);
-
-                }
-            }
+            CurrentOverlays.Add(FOP);
+            CurrentOverlays.Add(SOP);
+            CurrentOverlays.Add(TOP);
 
             ///Adding line annotation...
 
 
-
-            var la = new OxyPlot.Annotations.LineAnnotation { Type = LineAnnotationType.Horizontal, Y = Stck.Last().Close };
+            var la = new OxyPlot.Annotations.LineAnnotation { Type = LineAnnotationType.Horizontal, Y = TradingList.Last().Close };
             la.MouseDown += (s, e) =>
             {
                 if (e.ChangedButton != OxyMouseButton.Left)
@@ -319,8 +297,8 @@ namespace SpookyToot
                 }
             };
 
-            List<OxyPlot.Annotations.LineAnnotation> A = new List<OxyPlot.Annotations.LineAnnotation> ();
-            A.AddRange(MarketStructure.DefineSupportResistanceZones(Stck));
+            List<OxyPlot.Annotations.RectangleAnnotation> A = new List<OxyPlot.Annotations.RectangleAnnotation> ();
+            A.AddRange(MarketStructure.DefineSupportResistanceZones(CurrentStock,Period));
             
             foreach(var c in A)
             {
