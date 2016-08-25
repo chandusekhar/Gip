@@ -42,7 +42,6 @@ namespace SpookyToot
             IsPivotHigh = new List<bool>() { false, false, false, false };
             IsPivotLow = new List<bool>() { false, false, false, false };
         }
-
     }
 
     public class Stock
@@ -58,9 +57,7 @@ namespace SpookyToot
         public List<TradingPeriod> WeeklyHist { get; set; }
         public List<TradingPeriod> MonthlyHist { get; set; }
         public string StockName { get; set; }
-
-       
-
+      
         public void GetPivots(Stock.Interval Period)
         {
             List<TradingPeriod> TempList = new List<TradingPeriod>();
@@ -78,7 +75,6 @@ namespace SpookyToot
                     Hist = MonthlyHist;
                     break;
             }
-
 
             for (int i = 1; i < Hist.Count -1; i++)
             {
@@ -142,8 +138,6 @@ namespace SpookyToot
                     MonthlyHist = Hist;
                     break;
             }
-
-
         }
 
         public void BuildStockHist(StreamReader YahooData, string Ticker, Stock.Interval Period)

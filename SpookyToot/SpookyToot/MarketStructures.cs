@@ -15,9 +15,9 @@ namespace SpookyToot
 	{
 
 
-        public static List<OxyPlot.Annotations.RectangleAnnotation> DefineSupportResistanceZones(Stock T, Stock.Interval Period)
+        public static List<OxyPlot.Annotations.LineAnnotation> DefineSupportResistanceZones(Stock T, Stock.Interval Period)
         {
-            List<OxyPlot.Annotations.RectangleAnnotation> SAR = new List<OxyPlot.Annotations.RectangleAnnotation>();
+            List<OxyPlot.Annotations.LineAnnotation> SAR = new List<OxyPlot.Annotations.LineAnnotation>();
             List<TradingPeriod> TList = new List<TradingPeriod>();
             int VolaTilityRange = 0;
             int min = 0;
@@ -26,7 +26,7 @@ namespace SpookyToot
                 case Stock.Interval.Day:
                     TList = T.DailyHist;
                     VolaTilityRange = 20;
-                    min = 10;
+                    min = 3;
                     break;
                 case Stock.Interval.Week:
                     TList = T.WeeklyHist;
@@ -50,8 +50,8 @@ namespace SpookyToot
 
                 double STDev = Accord.Statistics.Measures.StandardDeviation(TList.GetRange(TList.IndexOf(LowPivots[i]) - VolaTilityRange, VolaTilityRange).Select(x => x.Close).ToArray());
 
-                double yOne = LowPivots[i].Low  * 1.05;
-                double yTwo = LowPivots[i].Low *0.95;
+                double yOne = LowPivots[i].Low  * 1.02;
+                double yTwo = LowPivots[i].Low *0.98;
 
                 List<TradingPeriod> Temps = new List<TradingPeriod>();
 
@@ -68,31 +68,25 @@ namespace SpookyToot
 
                 if (Temps.Count > min)
                 {
-                    OxyPlot.Annotations.RectangleAnnotation temp = new OxyPlot.Annotations.RectangleAnnotation();
+                    OxyPlot.Annotations.LineAnnotation temp = new OxyPlot.Annotations.LineAnnotation();
+
+
+                    temp.Type = LineAnnotationType.Horizontal;
                     temp.MinimumX = Temps.Min(x => x.Day.Ticks);
                     temp.MaximumX = Temps.Max(x => x.Day.Ticks);
-                    temp.MinimumY = Temps.Min(x => x.Close);
-                    temp.MaximumY = Temps.Max(x => x.Close);
+                    temp.Y = Temps.Min(x => x.Close);
+                    //temp.MaximumY = Temps.Max(x => x.Close);
                     //temp.Color = OxyColors.Transparent;
-                    OxyColor A = new OxyColor();
-                    A = OxyColors.Wheat;
-                   
 
-                    temp.Fill = OxyColors.Wheat;
+                    temp.Color = OxyColors.Wheat;
                   
                     SAR.Add(temp);
                 }
-
-
-
             }
 
             /// Get Resistance
 
             //for (int i = T.Count; i >= 0 )
-
-
-
                 return SAR;
         }
     }

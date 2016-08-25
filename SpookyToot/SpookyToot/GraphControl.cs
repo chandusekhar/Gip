@@ -31,7 +31,7 @@ namespace SpookyToot
         public GraphControl()
         {
             YahooApiInterface T = new YahooApiInterface();
-            List<Stock> SGH = new List<Stock>( T.getYahooData(new List<string>() { "AVL.AX" }, new DateTime(2014, 01, 01)));
+            List<Stock> SGH = new List<Stock>( T.getYahooData(new List<string>() { "SGH.AX" }, new DateTime(2014, 01, 01)));
 
             CurrentStock = SGH[0];
 
@@ -297,12 +297,11 @@ namespace SpookyToot
                 }
             };
 
-            List<OxyPlot.Annotations.RectangleAnnotation> A = new List<OxyPlot.Annotations.RectangleAnnotation> ();
+            List<OxyPlot.Annotations.LineAnnotation> A = new List<OxyPlot.Annotations.LineAnnotation> ();
             A.AddRange(MarketStructure.DefineSupportResistanceZones(CurrentStock,Period));
             
             foreach(var c in A)
-            {
-                
+            {              
                 pm.Annotations.Add(c);
             }
 
