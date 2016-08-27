@@ -18,6 +18,7 @@ namespace SpookyToot
         public double Close { get; set; }
         public double AdjClose { get; set; }
         public long Volume { get; set; }
+        public double ReturnSeries { get; set; }
 
         public List<bool> IsPivotHigh { get; set; }
         public List<bool> IsPivotLow { get; set; }
@@ -183,6 +184,12 @@ namespace SpookyToot
                         DailyHist.Add(TmpDay);
                     }
 
+                    DailyHist = DailyHist.OrderBy(x => x.Day.Ticks).ToList();
+
+                    for (int i = 1; i < DailyHist.Count - 1; i++)
+                    {
+                        DailyHist[i].ReturnSeries = DailyHist[i].AdjClose / DailyHist[i - 1].AdjClose - 1;
+                    }
                     break;
 
                 case Interval.Week:
@@ -223,7 +230,16 @@ namespace SpookyToot
 
                         WeeklyHist.Add(TmpWeek);
                     }
-                    
+
+                    WeeklyHist = WeeklyHist.OrderBy(x => x.Day.Ticks).ToList();
+
+                    for (int i = 1; i < WeeklyHist.Count - 1; i++)
+                    {
+                        WeeklyHist[i].ReturnSeries = WeeklyHist[i].AdjClose/WeeklyHist[i - 1].AdjClose - 1;
+                    }
+
+
+
                     break;
 
                 case Interval.Month:
@@ -264,7 +280,11 @@ namespace SpookyToot
 
                         MonthlyHist.Add(TmpWeek);
                     }
-
+                    MonthlyHist = MonthlyHist.OrderBy(x => x.Day.Ticks).ToList();
+                    for (int i = 1; i < MonthlyHist.Count - 1; i++)
+                    {
+                        MonthlyHist[i].ReturnSeries = MonthlyHist[i].AdjClose / MonthlyHist[i - 1].AdjClose - 1;
+                    }
 
                     break;
             }

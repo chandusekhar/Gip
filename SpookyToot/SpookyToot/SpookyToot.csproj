@@ -134,6 +134,9 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="TA-Lib-Core">
+      <HintPath>..\packages\TA-Lib-Core.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -145,6 +148,7 @@
     </ApplicationDefinition>
     <Compile Include="GraphControl.cs" />
     <Compile Include="GraphOverlays.cs" />
+    <Compile Include="Indicators.cs" />
     <Compile Include="MarketStructures.cs" />
     <Compile Include="StockStructures.cs" />
     <Compile Include="YahooApiInterface.cs" />

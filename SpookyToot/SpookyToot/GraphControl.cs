@@ -93,7 +93,7 @@ namespace SpookyToot
 
     
             // create bars
-            foreach (var v in TradingList.OrderBy(x => x.Day.Ticks))
+            foreach (var v in TradingList)
             {
                 OhlcvItem Temp = new OhlcvItem();
                 Temp.BuyVolume = (v.Volume);
