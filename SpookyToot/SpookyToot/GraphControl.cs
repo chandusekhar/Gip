@@ -101,7 +101,7 @@ namespace SpookyToot
                 Temp.High = v.High;
                 Temp.Low = v.Low;
                 Temp.Open = v.Open;
-                Temp.X = v.Day.Ticks;
+                Temp.X = v.Index;
 
                 series.Append(Temp);
             }
@@ -185,12 +185,12 @@ namespace SpookyToot
 
             foreach (var f in TradingList)
             {
-                if (f.IsPivotHigh[0]) FirstOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.LawnGreen, X = f.Day.Ticks, Y = f.High });
-                if (f.IsPivotHigh[1]) SecondOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Green, X = f.Day.Ticks, Y = f.High });
-                if (f.IsPivotHigh[2]) ThirdOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.DarkGreen, X = f.Day.Ticks, Y = f.High });
-                if (f.IsPivotLow[0]) FirstOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Pink, X = f.Day.Ticks, Y = f.Low });
-                if (f.IsPivotLow[1]) SecondOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Red, X = f.Day.Ticks, Y = f.Low });
-                if (f.IsPivotLow[2]) ThirdOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.DarkRed, X = f.Day.Ticks, Y = f.Low });
+                if (f.IsPivotHigh[0]) FirstOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.LawnGreen, X = f.Index, Y = f.High });
+                if (f.IsPivotHigh[1]) SecondOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Green, X = f.Index, Y = f.High });
+                if (f.IsPivotHigh[2]) ThirdOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.DarkGreen, X = f.Index, Y = f.High });
+                if (f.IsPivotLow[0]) FirstOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Pink, X = f.Index, Y = f.Low });
+                if (f.IsPivotLow[1]) SecondOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Red, X = f.Index, Y = f.Low });
+                if (f.IsPivotLow[2]) ThirdOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.DarkRed, X = f.Index, Y = f.Low });
             }
 
             GraphOverlays FOP = new GraphOverlays();

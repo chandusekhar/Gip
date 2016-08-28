@@ -11,6 +11,7 @@ namespace SpookyToot
 {
     public class TradingPeriod
     {
+        public int Index { get; set; }
         public DateTime Day { get; set; }
         public double High { get; set; }
         public double Low { get; set; }
@@ -186,9 +187,13 @@ namespace SpookyToot
 
                     DailyHist = DailyHist.OrderBy(x => x.Day.Ticks).ToList();
 
-                    for (int i = 1; i < DailyHist.Count - 1; i++)
+                    for (int i = 1; i < DailyHist.Count ; i++)
                     {
                         DailyHist[i].ReturnSeries = DailyHist[i].AdjClose / DailyHist[i - 1].AdjClose - 1;
+                    }
+                    for (int i = 0; i < DailyHist.Count ; i++)
+                    {
+                        DailyHist[i].Index = i+1;
                     }
                     break;
 
@@ -233,11 +238,14 @@ namespace SpookyToot
 
                     WeeklyHist = WeeklyHist.OrderBy(x => x.Day.Ticks).ToList();
 
-                    for (int i = 1; i < WeeklyHist.Count - 1; i++)
+                    for (int i = 1; i < WeeklyHist.Count ; i++)
                     {
                         WeeklyHist[i].ReturnSeries = WeeklyHist[i].AdjClose/WeeklyHist[i - 1].AdjClose - 1;
                     }
-
+                    for (int i = 0; i < WeeklyHist.Count ; i++)
+                    {
+                        WeeklyHist[i].Index = i+1;
+                    }
 
 
                     break;
@@ -281,11 +289,14 @@ namespace SpookyToot
                         MonthlyHist.Add(TmpWeek);
                     }
                     MonthlyHist = MonthlyHist.OrderBy(x => x.Day.Ticks).ToList();
-                    for (int i = 1; i < MonthlyHist.Count - 1; i++)
+                    for (int i = 1; i < MonthlyHist.Count; i++)
                     {
                         MonthlyHist[i].ReturnSeries = MonthlyHist[i].AdjClose / MonthlyHist[i - 1].AdjClose - 1;
                     }
-
+                    for (int i = 0; i < MonthlyHist.Count ; i++)
+                    {
+                        MonthlyHist[i].Index = i+1;
+                    }
                     break;
             }
 
