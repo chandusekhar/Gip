@@ -21,7 +21,7 @@ namespace SpookyToot
             var webClient = new WebClient();
 
 
-            var urlPrototype = @"http://ichart.finance.yahoo.com/table.csv?s={0}&a{1}&b={2}&c={3}&d={4}&e={5}&f={6}&g={7}&ignore=.csv";
+            var urlPrototype = @"http://ichart.finance.yahoo.com/table.csv?s={0}&a={1}&b={2}&c={3}&d={4}&e={5}&f={6}&g={7}&ignore=.csv";
             var dayFilePrototype = "{0}_{1}.{2}.{3}-{4}.{5}.{6}.csv";
             var weekFilePrototype = "{0}_{1}.{2}.{3}-{4}.{5}.{6}.csv";
 
@@ -32,7 +32,7 @@ namespace SpookyToot
 
                 foreach (var dayWeek in dayOrWeek)
                 {
-                    url = string.Format(urlPrototype, stock, FromDate.Month, FromDate.Day, FromDate.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Year, dayWeek);
+                    url = string.Format(urlPrototype, stock, FromDate.Month -1, FromDate.Day, FromDate.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Year, dayWeek);
 
                     try
                     {
