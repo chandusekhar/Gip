@@ -61,7 +61,7 @@ namespace SpookyToot
 
                 if (a.Period == Stock.Interval.Day)
                 {
-                    var c = a.Overlay as List<OxyPlot.Annotations.PointAnnotation>;
+                    var c = a.Overlay as List<OxyPlot.Annotations.Annotation>;
                     foreach (var t in c)
                     {
                         b.ModelViewDaily.Model.Annotations.Add(t);
@@ -70,7 +70,7 @@ namespace SpookyToot
                 }
                 if (a.Period == Stock.Interval.Week)
                 {
-                    var c = a.Overlay as List<OxyPlot.Annotations.PointAnnotation>;
+                    var c = a.Overlay as List<OxyPlot.Annotations.Annotation>;
                     foreach (var t in c)
                     {
                         b.ModelViewWeekly.Model.Annotations.Add(t);
@@ -80,7 +80,7 @@ namespace SpookyToot
                 }
                 if (a.Period == Stock.Interval.Month)
                 {
-                    var c = a.Overlay as List<OxyPlot.Annotations.PointAnnotation>;
+                    var c = a.Overlay as List<OxyPlot.Annotations.Annotation>;
                     foreach (var t in c)
                     {
                         b.ModelViewMonthly.Model.Annotations.Add(t);
@@ -101,7 +101,7 @@ namespace SpookyToot
                 var b = this.DataContext as GraphControl;
                 if (a.Period == Stock.Interval.Hour)
                 {
-                    var c = a.Overlay as List<OxyPlot.Annotations.PointAnnotation>;
+                    var c = a.Overlay as List<OxyPlot.Annotations.Annotation>;
                     foreach (var t in c)
                     {
                         b.ModelViewDaily.Model.Annotations.Remove(t);
@@ -111,7 +111,7 @@ namespace SpookyToot
                 }
                 if (a.Period == Stock.Interval.Day)
                 {
-                    var c = a.Overlay as List<OxyPlot.Annotations.PointAnnotation>;
+                    var c = a.Overlay as List<OxyPlot.Annotations.Annotation>;
                     foreach (var t in c)
                     {
                         b.ModelViewDaily.Model.Annotations.Remove(t);
@@ -121,7 +121,7 @@ namespace SpookyToot
                 }
                 if (a.Period == Stock.Interval.Week)
                 {
-                    var c = a.Overlay as List<OxyPlot.Annotations.PointAnnotation>;
+                    var c = a.Overlay as List<OxyPlot.Annotations.Annotation>;
                     foreach (var t in c)
                     {
                         b.ModelViewWeekly.Model.Annotations.Remove(t);
@@ -131,7 +131,7 @@ namespace SpookyToot
                 }
                 if (a.Period == Stock.Interval.Month)
                 {
-                    var c = a.Overlay as List<OxyPlot.Annotations.PointAnnotation>;
+                    var c = a.Overlay as List<OxyPlot.Annotations.Annotation>;
                     foreach (var t in c)
                     {
                         b.ModelViewMonthly.Model.Annotations.Remove(t);

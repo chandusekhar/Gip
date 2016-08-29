@@ -20,7 +20,7 @@ namespace SpookyToot
         public double AdjClose { get; set; }
         public long Volume { get; set; }
         public double ReturnSeries { get; set; }
-
+       
         public List<bool> IsPivotHigh { get; set; }
         public List<bool> IsPivotLow { get; set; }
 

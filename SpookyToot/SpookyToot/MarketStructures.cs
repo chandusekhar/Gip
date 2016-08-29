@@ -25,27 +25,27 @@ namespace SpookyToot
             {
                 case Stock.Interval.Hour:
                     TList = T.HourlyHist;
-                    VolaTilityRange = 20;
-                    AnnualisationFactor = 262*6;
+                    VolaTilityRange = 120;
+                    AnnualisationFactor = 252 * 6;
                     min = 10;
                     break;
                 case Stock.Interval.Day:
                     TList = T.DailyHist;
-                    VolaTilityRange = 25;
-                    AnnualisationFactor = 262;
+                    VolaTilityRange = 21;
+                    AnnualisationFactor = 252;
                     min = 10;
                     break;
                 case Stock.Interval.Week:
                     TList = T.WeeklyHist;
-                    VolaTilityRange = 6;
-                    AnnualisationFactor = 37.3;
-                    min = 2;
+                    VolaTilityRange = 4;
+                    AnnualisationFactor = 52;
+                    min = 3;
                     break;
                 case Stock.Interval.Month:
                     TList = T.MonthlyHist;
-                    VolaTilityRange = 2;
-                    AnnualisationFactor = 8.6;
-                    min = 1;
+                    VolaTilityRange = 1;
+                    AnnualisationFactor = 12;
+                    min = 3;
                     break;
             }
 
@@ -59,7 +59,22 @@ namespace SpookyToot
             {
                 if (i < VolaTilityRange) VolaTilityRange = i;
 
-                double STDev = Accord.Statistics.Measures.StandardDeviation(TList.GetRange(TList.IndexOf(LowPivots[i]) - VolaTilityRange, VolaTilityRange).Select(x => x.ReturnSeries).ToArray()) * Math.Sqrt(AnnualisationFactor);
+                List<double> LogReturns = new List<double>();
+                List<double> Prices = TList.GetRange(TList.IndexOf(LowPivots[i]) - VolaTilityRange, VolaTilityRange).Select(x => x.AdjClose).ToList();
+                for(int MN = 1; MN< VolaTilityRange; MN++)
+                {
+                    double Temp = Math.Log(Prices[MN] / Prices[MN - 1]);
+                    LogReturns.Add(Temp);
+                }
+                double STDev = Accord.Statistics.Measures.StandardDeviation(LogReturns.ToArray()) * Math.Sqrt(AnnualisationFactor);
+
+
+
+                //double STDev = Accord.Statistics.Measures.StandardDeviation(TList.GetRange(TList.IndexOf(LowPivots[i]) - VolaTilityRange, VolaTilityRange).Select(x => x.ReturnSeries).ToArray()) * Math.Sqrt(AnnualisationFactor);
+
+                //double yOne = LowPivots[i].AdjClose + STDev;
+                //double yTwo = LowPivots[i].AdjClose - STDev;
+
                 double yOne = Math.Abs(LowPivots[i].Close * (1 + Math.Pow(STDev, 2)));
                 double yTwo = Math.Abs(LowPivots[i].Close * (1 - Math.Pow(STDev, 2)));
 
@@ -67,37 +82,36 @@ namespace SpookyToot
 
                 for (int x = i; x >= 0; x--)
                 {
-
                     if (LowPivots[x].Close > yTwo && LowPivots[x].Close < yOne) Temps.Add(LowPivots[x]);
                     else break;
                 }
 
                 for (int x = i; x < LowPivots.Count - 1; x++)
                 {
-
                     if (LowPivots[x].Close > yTwo && LowPivots[x].Close < yOne) Temps.Add(LowPivots[x]);
                     else break;
                 }
 
                 if (Temps.Count > min)
                 {
+                    
                     OxyPlot.Annotations.LineAnnotation temp = new OxyPlot.Annotations.LineAnnotation();
                     OxyPlot.Annotations.LineAnnotation temp2 = new OxyPlot.Annotations.LineAnnotation();
-
+              
                     temp.Type = LineAnnotationType.Horizontal;
                     temp.MinimumX = Temps.Min(x => x.Index);
                     temp.MaximumX = Temps.Max(x => x.Index);
+                    //if (Period != Stock.Interval.Week) temp.Y = Temps.OrderBy(x => x.Close).Take(2).Last().Close;
+                    //else temp.Y = Temps.Min(x => x.Close);
                     temp.Y = Temps.Min(x => x.Close);
-                    //temp.MaximumY = Temps.Max(x => x.Close);
-                    //temp.Color = OxyColors.Transparent;
                     temp.Color = OxyColors.Red;
 
                     temp2.Type = LineAnnotationType.Horizontal;
                     temp2.MinimumX = Temps.Min(x => x.Index);
                     temp2.MaximumX = Temps.Max(x => x.Index);
+                    //if (Period != Stock.Interval.Week) temp2.Y = Temps.OrderByDescending(x => x.Close).Take(2).Last().Close;
+                    //else temp2.Y = Temps.Max(x => x.Close);
                     temp2.Y = Temps.Max(x => x.Close);
-                    //temp.MaximumY = Temps.Max(x => x.Close);
-                    //temp.Color = OxyColors.Transparent;
                     temp2.Color = OxyColors.Red;
 
 
@@ -158,26 +172,26 @@ namespace SpookyToot
             {
                 case Stock.Interval.Hour:
                     TList = T.HourlyHist;
-                    VolaTilityRange = 20;
-                    AnnualisationFactor = 262 * 6;
+                    VolaTilityRange = 120;
+                    AnnualisationFactor = 252 * 6;
                     min = 10;
                     break;
                 case Stock.Interval.Day:
                     TList = T.DailyHist;
-                    VolaTilityRange = 25;
-                    AnnualisationFactor = 262;
+                    VolaTilityRange = 21;
+                    AnnualisationFactor = 252;
                     min = 10;
                     break;
                 case Stock.Interval.Week:
                     TList = T.WeeklyHist;
-                    VolaTilityRange = 6;
-                    AnnualisationFactor = 37.3;
+                    VolaTilityRange = 4;
+                    AnnualisationFactor = 52;
                     min = 2;
                     break;
                 case Stock.Interval.Month:
                     TList = T.MonthlyHist;
-                    VolaTilityRange = 2;
-                    AnnualisationFactor = 8.6;
+                    VolaTilityRange = 1;
+                    AnnualisationFactor = 12;
                     min = 1;
                     break;
             }
@@ -189,10 +203,25 @@ namespace SpookyToot
             {
                 if (i < VolaTilityRange) VolaTilityRange = i;
 
-                double STDev = Accord.Statistics.Measures.StandardDeviation(TList.GetRange(TList.IndexOf( HighPivots[i]) - VolaTilityRange, VolaTilityRange).Select(x => x.ReturnSeries).ToArray()) * Math.Sqrt(AnnualisationFactor);
+
+                List<double> LogReturns = new List<double>();
+                List<double> Prices = TList.GetRange(TList.IndexOf(HighPivots[i]) - VolaTilityRange, VolaTilityRange).Select(x => x.AdjClose).ToList();
+                for (int MN = 1; MN < VolaTilityRange; MN++)
+                {
+                    double Temp = Math.Log(Prices[MN] / Prices[MN - 1]);
+                    LogReturns.Add(Temp);
+                }
+                double STDev = Accord.Statistics.Measures.StandardDeviation(LogReturns.ToArray()) * Math.Sqrt(AnnualisationFactor);
+
+
+
+                //double STDev = Accord.Statistics.Measures.StandardDeviation(TList.GetRange(TList.IndexOf( HighPivots[i]) - VolaTilityRange, VolaTilityRange).Select(x => x.ReturnSeries).ToArray()) * Math.Sqrt(AnnualisationFactor);
 
                 double yOne = Math.Abs(HighPivots[i].Close * (1 + Math.Pow(STDev, 2)));
                 double yTwo = Math.Abs(HighPivots[i].Close * (1 - Math.Pow(STDev, 2)));
+
+                //double yOne = HighPivots[i].AdjClose + STDev;
+                //double yTwo = HighPivots[i].AdjClose - STDev;
 
                 List<TradingPeriod> Temps = new List<TradingPeriod>();
 
@@ -219,17 +248,17 @@ namespace SpookyToot
                     temp.Type = LineAnnotationType.Horizontal;
                     temp.MinimumX = Temps.Min(x => x.Index);
                     temp.MaximumX = Temps.Max(x => x.Index);
-                    temp.Y = Temps.Max(x => x.Close);
-                    //temp.MaximumY = Temps.Max(x => x.Close);
-                    //temp.Color = OxyColors.Transparent;
+                    //if (Period != Stock.Interval.Week) temp2.Y = Temps.OrderByDescending(x => x.Close).Take(2).Last().Close;
+                    //else temp2.Y = Temps.Max(x => x.Close);
+                    temp2.Y = Temps.Max(x => x.Close);
                     temp.Color = OxyColors.LawnGreen;
 
                     temp2.Type = LineAnnotationType.Horizontal;
                     temp2.MinimumX = Temps.Min(x => x.Index);
                     temp2.MaximumX = Temps.Max(x => x.Index);
-                    temp2.Y = Temps.Min(x => x.Close);
-                    //temp.MaximumY = Temps.Max(x => x.Close);
-                    //temp.Color = OxyColors.Transparent;
+                    //if (Period != Stock.Interval.Week) temp.Y = Temps.OrderBy(x => x.Close).Take(2).Last().Close;
+                    //else temp.Y = Temps.Min(x => x.Close);
+                    temp.Y = Temps.Min(x => x.Close);
                     temp2.Color = OxyColors.LawnGreen;
 
                     SAR.Add(temp);

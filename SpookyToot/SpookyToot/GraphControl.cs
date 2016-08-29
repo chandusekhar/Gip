@@ -32,7 +32,7 @@ namespace SpookyToot
         public GraphControl()
         {
             YahooApiInterface T = new YahooApiInterface();
-            List<Stock> SGH = new List<Stock>( T.getYahooData(new List<string>() { "sgh.AX" }, new DateTime(2013, 01, 01)));
+            List<Stock> SGH = new List<Stock>( T.getYahooData(new List<string>() { "wow.AX" }, new DateTime(2013, 01, 01)));
 
             CurrentStock = SGH[0];
 
@@ -113,12 +113,12 @@ namespace SpookyToot
             }
 
             // create visible window
-            var Istart = length - (int)Math.Round( 0.1*length);
-            var Iend = length - (int)Math.Round( 0.08*length);
+            var Istart = length - 100;
+            var Iend = length+20;
             var Ymin = series.Items.Skip(Istart).Take(Iend - Istart + 1).Select(x => x.Low).Min();
             var Ymax = series.Items.Skip(Istart).Take(Iend - Istart + 1).Select(x => x.High).Max();
             var Xmin = series.Items[Istart].X;
-            var Xmax = series.Items[Iend].X;
+            var Xmax = series.Items[length-1].X;
 
             // setup axes
             var timeAxis = new OxyPlot.Axes.DateTimeAxis
@@ -185,6 +185,7 @@ namespace SpookyToot
             /// 
             Stck.GetPivots(Period);
 
+            var ResistanceLines = new List<OxyPlot.Annotations.LineAnnotation>();
             var FirstOrderPivots = new List<OxyPlot.Annotations.PointAnnotation>();
             var SecondOrderPivots = new List<OxyPlot.Annotations.PointAnnotation>();
             var ThirdOrderPivots = new List<OxyPlot.Annotations.PointAnnotation>();
@@ -198,27 +199,32 @@ namespace SpookyToot
                 if (f.IsPivotLow[1]) SecondOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Red, X = f.Index, Y = f.Low });
                 if (f.IsPivotLow[2]) ThirdOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.DarkRed, X = f.Index, Y = f.Low });
             }
+            ResistanceLines = MarketStructure.DefineSupportResistanceZonesPivots(Stck, Period);
 
             GraphOverlays FOP = new GraphOverlays();
             GraphOverlays SOP = new GraphOverlays();
             GraphOverlays TOP = new GraphOverlays();
+            GraphOverlays Lines = new GraphOverlays();
 
             FOP.Name = "First Order Pivot";
             SOP.Name = "Second Order Pivot";
             TOP.Name = "Third Order Pivot";
+            Lines.Name = "Resistance Lines";
 
             FOP.Overlay = FirstOrderPivots;
             SOP.Overlay = SecondOrderPivots;
             TOP.Overlay = ThirdOrderPivots;
+            Lines.Overlay = ResistanceLines;
 
             FOP.Period = Period;
             SOP.Period = Period;
             TOP.Period = Period;
+            Lines.Period = Period;
 
             CurrentOverlays.Add(FOP);
             CurrentOverlays.Add(SOP);
             CurrentOverlays.Add(TOP);
-
+            CurrentOverlays.Add(Lines);
             ///Adding line annotation...
 
 
@@ -302,14 +308,7 @@ namespace SpookyToot
                     e.Handled = true;
                 }
             };
-
-            List<OxyPlot.Annotations.LineAnnotation> A = new List<OxyPlot.Annotations.LineAnnotation> ();
-            A.AddRange(MarketStructure.DefineSupportResistanceZonesPivots(CurrentStock,Period));
-            
-            foreach(var c in A)
-            {              
-                pm.Annotations.Add(c);
-            }
+            pm.Title = Stck.StockName;
 
             var controller = new PlotController();
 
@@ -338,7 +337,7 @@ namespace SpookyToot
                 ymax = Math.Max(ymax, bar.High);
             }
 
-            yaxis.Zoom(ymin * (0.94), ymax *1.06);
+            yaxis.Zoom(ymin * (0.999), ymax *1.001);
         }
     }
     }
