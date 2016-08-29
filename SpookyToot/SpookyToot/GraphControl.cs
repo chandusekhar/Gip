@@ -59,24 +59,34 @@ namespace SpookyToot
         public Example GenerateGraph(Stock Stck, Stock.Interval Period)
         {
             int length = 0;
+            double startPost = 0;
+            double endPOs = 0;
             List<TradingPeriod> TradingList = new List<TradingPeriod>();
             switch (Period)
             {
                 case Stock.Interval.Hour:
                     length = Stck.HourlyHist.Count;
                     TradingList = Stck.HourlyHist;
+                    startPost = length + 6;
+                    endPOs = length - 50;
                     break;
                 case Stock.Interval.Day:
                     length = Stck.DailyHist.Count;
                     TradingList = Stck.DailyHist;
+                    startPost = length + 6;
+                    endPOs = length - 110;
                     break;
                 case Stock.Interval.Week:
                     length = Stck.WeeklyHist.Count;
                     TradingList = Stck.WeeklyHist;
+                    startPost = length + 6;
+                    endPOs = length - 80;
                     break;
                 case Stock.Interval.Month:
                     length = Stck.MonthlyHist.Count;
                     TradingList = Stck.MonthlyHist;
+                    startPost = length + 3;
+                    endPOs = length - 48;
                     break;
             }
 
@@ -113,22 +123,22 @@ namespace SpookyToot
             }
 
             // create visible window
-            var Istart = length - 100;
+            var Istart = length - 60;
             var Iend = length+20;
             var Ymin = series.Items.Skip(Istart).Take(Iend - Istart + 1).Select(x => x.Low).Min();
             var Ymax = series.Items.Skip(Istart).Take(Iend - Istart + 1).Select(x => x.High).Max();
-            var Xmin = series.Items[Istart].X;
-            var Xmax = series.Items[length-1].X;
 
             // setup axes
             var timeAxis = new OxyPlot.Axes.DateTimeAxis
             {
                 Position = AxisPosition.Bottom,
-                Minimum = Xmin,
-                Maximum = Xmax,
+                Minimum = endPOs,
+                Maximum = startPost,
+                
                 //StartPosition = Xmax - TimeSpan.FromDays(180).Ticks,
                 //EndPosition = Xmax,
             };
+  
             var barAxis = new OxyPlot.Axes.LogarithmicAxis()
             {
                 Position = AxisPosition.Left,

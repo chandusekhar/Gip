@@ -32,9 +32,24 @@ namespace SpookyToot
 
         }
 
-        private void WeeklyView_KeyDown(object sender, KeyEventArgs e)
+        private void DailyView_OnKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Space)
+            {
+                if (dayShwoing)
+                {
+                    dayShwoing = false;
+                    DailyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewHourly.Model"));
+                }
+                else
+                {
+                    DailyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewDaily.Model"));
+                    dayShwoing = true;
+                }
+                DailyView.Model.InvalidatePlot(true);
+
+            }
+            else if (e.Key == Key.Enter)
             {
                 if (WeekShowing)
                 {
@@ -47,9 +62,10 @@ namespace SpookyToot
                     WeekShowing = true;
                 }
                 WeeklyMonthlyView.Model.InvalidatePlot(true);
-
             }
+            
         }
+
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
@@ -146,24 +162,7 @@ namespace SpookyToot
 
         }
 
-        private void DailyView_OnKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Space)
-            {
-                if (dayShwoing)
-                {
-                    dayShwoing = false;
-                    DailyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewHourly.Model"));
-                }
-                else
-                {
-                    DailyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewDaily.Model"));
-                    dayShwoing = true;
-                }
-                DailyView.Model.InvalidatePlot(true);
 
-            }
-        }
     }
 }
 
