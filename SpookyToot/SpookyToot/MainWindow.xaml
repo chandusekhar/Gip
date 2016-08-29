@@ -20,7 +20,7 @@
             <RowDefinition Height="10*"/>
         </Grid.RowDefinitions>
 
-            <oxy:PlotView x:Name="DailyView" Model="{Binding ModelViewDaily.Model}" Controller="{Binding ModelViewDaily.Controller }" Grid.Row="0" Grid.Column="0" />
+            <oxy:PlotView x:Name="DailyView" Model="{Binding ModelViewDaily.Model}" Controller="{Binding ModelViewDaily.Controller }" Grid.Row="0" Grid.Column="0" KeyDown="DailyView_OnKeyDown" />
         <oxy:PlotView x:Name="WeeklyMonthlyView" Model="{Binding ModelViewWeekly.Model}" Controller="{Binding ModelViewWeekly.Controller }" Grid.Row="0" Grid.Column="1" KeyDown="WeeklyView_KeyDown"/>
 
         <ItemsControl x:Name="PivotList" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"  ItemsSource="{Binding CurrentOverlays}">

@@ -23,6 +23,12 @@ namespace SpookyToot
             double AnnualisationFactor = 0;
             switch (Period)
             {
+                case Stock.Interval.Hour:
+                    TList = T.HourlyHist;
+                    VolaTilityRange = 20;
+                    AnnualisationFactor = 262*6;
+                    min = 10;
+                    break;
                 case Stock.Interval.Day:
                     TList = T.DailyHist;
                     VolaTilityRange = 25;
@@ -150,6 +156,12 @@ namespace SpookyToot
             /// 
             switch (Period)
             {
+                case Stock.Interval.Hour:
+                    TList = T.HourlyHist;
+                    VolaTilityRange = 20;
+                    AnnualisationFactor = 262 * 6;
+                    min = 10;
+                    break;
                 case Stock.Interval.Day:
                     TList = T.DailyHist;
                     VolaTilityRange = 25;

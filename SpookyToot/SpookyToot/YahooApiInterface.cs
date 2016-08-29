@@ -17,7 +17,7 @@ namespace SpookyToot
             List<Stock> ReturnedStocks = new List<Stock>();
 
             string url = "", dayFile = "", weekFile = "", directory = "", dayDirectory = "", weekDirectory = "";
-            var dayOrWeek = new string[] { "d", "w","m" };
+            var dayOrWeek = new string[] { "h","d", "w","m" };
             var webClient = new WebClient();
 
 
@@ -54,6 +54,11 @@ namespace SpookyToot
                                 var monthFileName = string.Format(weekFilePrototype, stock.ToUpper(), FromDate.Month, FromDate.Day, FromDate.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Year);
                                 var readDatamonthly = new StreamReader(webClient.OpenRead(url));
                                 Temp.BuildStockHist(readDatamonthly, stock, Stock.Interval.Month);
+                                break;
+                            case "h":
+                                url = "http://chartapi.finance.yahoo.com/instrument/1.0/" + stock.ToUpper() + "/chartdata;type=quote;range=45d/csv";
+                                var readDatahourly = new StreamReader(webClient.OpenRead(url));
+                                Temp.BuildStockHist(readDatahourly, stock, Stock.Interval.Hour);
                                 break;
                         }
                     }

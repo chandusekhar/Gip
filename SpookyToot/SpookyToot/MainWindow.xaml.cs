@@ -23,6 +23,8 @@ namespace SpookyToot
     public partial class MainWindow : Window
     {
         private bool WeekShowing = true;
+        private bool dayShwoing = true;
+
 
         public MainWindow()
         {
@@ -97,7 +99,16 @@ namespace SpookyToot
             if (a != null)
             {
                 var b = this.DataContext as GraphControl;
+                if (a.Period == Stock.Interval.Hour)
+                {
+                    var c = a.Overlay as List<OxyPlot.Annotations.PointAnnotation>;
+                    foreach (var t in c)
+                    {
+                        b.ModelViewDaily.Model.Annotations.Remove(t);
+                    }
+                    DailyView.Model.InvalidatePlot(true);
 
+                }
                 if (a.Period == Stock.Interval.Day)
                 {
                     var c = a.Overlay as List<OxyPlot.Annotations.PointAnnotation>;
@@ -133,6 +144,25 @@ namespace SpookyToot
             }
 
 
+        }
+
+        private void DailyView_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+            {
+                if (dayShwoing)
+                {
+                    dayShwoing = false;
+                    DailyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewHourly.Model"));
+                }
+                else
+                {
+                    DailyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewDaily.Model"));
+                    dayShwoing = true;
+                }
+                DailyView.Model.InvalidatePlot(true);
+
+            }
         }
     }
 }

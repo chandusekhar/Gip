@@ -27,7 +27,7 @@ namespace SpookyToot
 
         public TradingPeriod(DateTime day, double high, double low, double open, double close, double adjclose, long volume)
         {
-            IsPivotHigh = new List<bool>(){false, false,false,false};
+            IsPivotHigh = new List<bool>() {false, false, false, false};
             IsPivotLow = new List<bool>() {false, false, false, false};
 
             Day = day;
@@ -41,8 +41,8 @@ namespace SpookyToot
 
         public TradingPeriod()
         {
-            IsPivotHigh = new List<bool>() { false, false, false, false };
-            IsPivotLow = new List<bool>() { false, false, false, false };
+            IsPivotHigh = new List<bool>() {false, false, false, false};
+            IsPivotLow = new List<bool>() {false, false, false, false};
         }
     }
 
@@ -50,16 +50,18 @@ namespace SpookyToot
     {
         public enum Interval
         {
+            Hour,
             Day,
             Week,
             Month,
         };
 
+        public List<TradingPeriod> HourlyHist { get; set; }
         public List<TradingPeriod> DailyHist { get; set; }
         public List<TradingPeriod> WeeklyHist { get; set; }
         public List<TradingPeriod> MonthlyHist { get; set; }
         public string StockName { get; set; }
-      
+
         public void GetPivots(Stock.Interval Period)
         {
             List<TradingPeriod> TempList = new List<TradingPeriod>();
@@ -67,18 +69,21 @@ namespace SpookyToot
 
             switch (Period)
             {
-                    case Interval.Day:
+                case Interval.Hour:
+                    Hist = HourlyHist;
+                    break;
+                case Interval.Day:
                     Hist = DailyHist;
                     break;
-                    case Interval.Week:
+                case Interval.Week:
                     Hist = WeeklyHist;
                     break;
-                    case Interval.Month:
+                case Interval.Month:
                     Hist = MonthlyHist;
                     break;
             }
 
-            for (int i = 1; i < Hist.Count -1; i++)
+            for (int i = 1; i < Hist.Count - 1; i++)
             {
                 if (Hist[i].High > Hist[i - 1].High && Hist[i].High > Hist[i + 1].High) Hist[i].IsPivotHigh[0] = true;
                 if (Hist[i].Low < Hist[i - 1].Low && Hist[i].Low < Hist[i + 1].Low) Hist[i].IsPivotLow[0] = true;
@@ -92,7 +97,7 @@ namespace SpookyToot
                 {
                     Hist[Hist.IndexOf(TempList[i])].IsPivotHigh[1] = true;
                     //Hist[Hist.IndexOf(TempList[i])].IsPivotHigh[0] = false;
-                 }
+                }
             }
 
             TempList = Hist.Where(x => x.IsPivotHigh[1]).ToList();
@@ -103,7 +108,7 @@ namespace SpookyToot
                 {
                     Hist[Hist.IndexOf(TempList[i])].IsPivotHigh[2] = true;
                     //Hist[Hist.IndexOf(TempList[i])].IsPivotHigh[1] = false;
-                 }
+                }
             }
 
             TempList = Hist.Where(x => x.IsPivotLow[0]).ToList();
@@ -127,25 +132,106 @@ namespace SpookyToot
                     //Hist[Hist.IndexOf(TempList[i])].IsPivotLow[1] = false;
                 }
             }
-
-            switch (Period)
-            {
-                case Interval.Day:
-                    DailyHist = Hist;
-                    break;
-                case Interval.Week:
-                    WeeklyHist = Hist;
-                    break;
-                case Interval.Month:
-                    MonthlyHist = Hist;
-                    break;
-            }
         }
 
         public void BuildStockHist(StreamReader YahooData, string Ticker, Stock.Interval Period)
         {
             switch (Period)
             {
+                case Interval.Hour:
+
+                    StockName = Ticker;
+                    HourlyHist = new List<TradingPeriod>();
+                    string a = "";
+
+
+                    while (!a.Contains("volume:"))
+                    {
+                        a = YahooData.ReadLine();
+                        //YahooData.ReadLine();
+                    }
+                    YahooData.ReadLine();
+                    if (!YahooData.EndOfStream)
+                    {
+                        DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+                        List<double> Opens = new List<double>();
+                        List<double> Highs = new List<double>();
+                        List<double> Lows = new List<double>();
+                        List<double> Closes = new List<double>();
+                        List<long> volumes = new List<long>();
+                        int Currenthour = -1;
+
+                        while (!YahooData.EndOfStream)
+                        {
+
+                            string Temp = YahooData.ReadLine();
+                            string[] TmpArry = Temp.Split(',');
+                            double open;
+                            double high;
+                            double low;
+                            double close;
+                            long volume;
+                            long time;
+
+                            long.TryParse(TmpArry[0], out time);
+                            double.TryParse(TmpArry[1], out close);
+                            double.TryParse(TmpArry[2], out high);
+                            double.TryParse(TmpArry[3], out low);
+                            double.TryParse(TmpArry[4], out open);
+                            long.TryParse(TmpArry[5], out volume);
+
+                            DateTime Temporig = origin;
+                            Temporig = Temporig.AddSeconds(time);
+                            if (Currenthour == -1) Currenthour = Temporig.Hour;
+                            if (Temporig.Hour == Currenthour)
+                            {
+                                Opens.Add(open);
+                                Highs.Add(high);
+                                Lows.Add(low);
+                                Closes.Add(close);
+                                volumes.Add(volume);
+                            }
+                            else
+                            {
+                                Currenthour = Temporig.Hour;
+                                TradingPeriod TmpDay = new TradingPeriod()
+                                {
+                                    Day = Convert.ToDateTime(Temporig).ToLocalTime(),
+                                    Open = Opens.First(),
+                                    High = Highs.Max(),
+                                    Low = Lows.Min(),
+                                    Close = Closes.Last(),
+                                    Volume = volumes.Sum(),
+                                };
+
+                                Opens = new List<double>();
+                                Highs = new List<double>();
+                                Lows = new List<double>();
+                                Closes = new List<double>();
+                                volumes = new List<long>();
+                                Opens.Add(open);
+                                Highs.Add(high);
+                                Lows.Add(low);
+                                Closes.Add(close);
+                                volumes.Add(volume);
+
+                                HourlyHist.Add(TmpDay);
+                            }
+                        }
+                        HourlyHist = HourlyHist.OrderBy(x => x.Day.Ticks).ToList();
+
+                        for (int i = 1; i < HourlyHist.Count; i++)
+                        {
+                            HourlyHist[i].ReturnSeries = HourlyHist[i].Close/HourlyHist[i - 1].Close - 1;
+                        }
+                        for (int i = 0; i < HourlyHist.Count; i++)
+                        {
+                            HourlyHist[i].Index = i + 1;
+                        }
+                    }
+
+                    break;
+
                 case Interval.Day:
 
                     StockName = Ticker;
@@ -187,13 +273,13 @@ namespace SpookyToot
 
                     DailyHist = DailyHist.OrderBy(x => x.Day.Ticks).ToList();
 
-                    for (int i = 1; i < DailyHist.Count ; i++)
+                    for (int i = 1; i < DailyHist.Count; i++)
                     {
-                        DailyHist[i].ReturnSeries = DailyHist[i].AdjClose / DailyHist[i - 1].AdjClose - 1;
+                        DailyHist[i].ReturnSeries = DailyHist[i].AdjClose/DailyHist[i - 1].AdjClose - 1;
                     }
-                    for (int i = 0; i < DailyHist.Count ; i++)
+                    for (int i = 0; i < DailyHist.Count; i++)
                     {
-                        DailyHist[i].Index = i+1;
+                        DailyHist[i].Index = i + 1;
                     }
                     break;
 
@@ -238,13 +324,13 @@ namespace SpookyToot
 
                     WeeklyHist = WeeklyHist.OrderBy(x => x.Day.Ticks).ToList();
 
-                    for (int i = 1; i < WeeklyHist.Count ; i++)
+                    for (int i = 1; i < WeeklyHist.Count; i++)
                     {
                         WeeklyHist[i].ReturnSeries = WeeklyHist[i].AdjClose/WeeklyHist[i - 1].AdjClose - 1;
                     }
-                    for (int i = 0; i < WeeklyHist.Count ; i++)
+                    for (int i = 0; i < WeeklyHist.Count; i++)
                     {
-                        WeeklyHist[i].Index = i+1;
+                        WeeklyHist[i].Index = i + 1;
                     }
 
 
@@ -291,11 +377,11 @@ namespace SpookyToot
                     MonthlyHist = MonthlyHist.OrderBy(x => x.Day.Ticks).ToList();
                     for (int i = 1; i < MonthlyHist.Count; i++)
                     {
-                        MonthlyHist[i].ReturnSeries = MonthlyHist[i].AdjClose / MonthlyHist[i - 1].AdjClose - 1;
+                        MonthlyHist[i].ReturnSeries = MonthlyHist[i].AdjClose/MonthlyHist[i - 1].AdjClose - 1;
                     }
-                    for (int i = 0; i < MonthlyHist.Count ; i++)
+                    for (int i = 0; i < MonthlyHist.Count; i++)
                     {
-                        MonthlyHist[i].Index = i+1;
+                        MonthlyHist[i].Index = i + 1;
                     }
                     break;
             }

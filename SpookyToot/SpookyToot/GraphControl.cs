@@ -21,6 +21,7 @@ namespace SpookyToot
 {
     public class GraphControl
     {
+        public Example ModelViewHourly { get; private set; }
         public Example ModelViewDaily { get; private set; }
         public Example ModelViewWeekly { get; private set; }
         public Example ModelViewMonthly{ get; private set; }
@@ -31,11 +32,12 @@ namespace SpookyToot
         public GraphControl()
         {
             YahooApiInterface T = new YahooApiInterface();
-            List<Stock> SGH = new List<Stock>( T.getYahooData(new List<string>() { "tpm.AX" }, new DateTime(2013, 01, 01)));
+            List<Stock> SGH = new List<Stock>( T.getYahooData(new List<string>() { "sgh.AX" }, new DateTime(2013, 01, 01)));
 
             CurrentStock = SGH[0];
 
             CurrentOverlays = new ObservableCollection<GraphOverlays>();
+            ModelViewHourly = GenerateGraph(CurrentStock, Stock.Interval.Hour);
             ModelViewDaily = GenerateGraph(CurrentStock, Stock.Interval.Day);
             ModelViewWeekly = GenerateGraph(CurrentStock, Stock.Interval.Week);
             ModelViewMonthly = GenerateGraph(CurrentStock, Stock.Interval.Month);
@@ -60,6 +62,10 @@ namespace SpookyToot
             List<TradingPeriod> TradingList = new List<TradingPeriod>();
             switch (Period)
             {
+                case Stock.Interval.Hour:
+                    length = Stck.HourlyHist.Count;
+                    TradingList = Stck.HourlyHist;
+                    break;
                 case Stock.Interval.Day:
                     length = Stck.DailyHist.Count;
                     TradingList = Stck.DailyHist;
