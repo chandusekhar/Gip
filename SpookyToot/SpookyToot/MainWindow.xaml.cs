@@ -68,11 +68,11 @@ namespace SpookyToot
                 var d = Market.DataContext as MetaData;
 
                 c.update(d.Cache[1]);
-                d.LastTikker();
 
                 ThreadPool.QueueUserWorkItem(delegate (object state) {
 
                     this.Dispatcher.BeginInvoke(new Action(() => {
+                        d.LastTikker();
 
                     }));
                 });
