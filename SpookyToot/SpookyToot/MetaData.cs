@@ -21,10 +21,18 @@ namespace SpookyToot
             string oldTick = Cache[4].StockName;
             int i = Tickers.IndexOf(oldTick) + 1;
             if (i == Tickers.Count) i = 0;
-
+            
             YahooApiInterface F = new YahooApiInterface();
             List<Stock> G = new List<Stock>();
             G .AddRange(F.getYahooData(new List<string>() {Tickers[i]}, new DateTime(2013, 01, 01)));
+            while (G[0].WeeklyHist == null || G[0].HourlyHist == null || G[0].DailyHist == null || G[0].MonthlyHist == null)
+            {
+                i = Tickers.IndexOf(G[0].StockName);
+                Tickers.Remove(G[0].StockName);
+                if (i == Tickers.Count) i = 0;
+                G = new List<Stock>();
+                G.AddRange(F.getYahooData(new List<string>() { Tickers[i] }, new DateTime(2013, 01, 01)));
+            }
 
             Cache[0] = Cache[1];
             Cache[1] = Cache[2];
@@ -42,6 +50,14 @@ namespace SpookyToot
             YahooApiInterface F = new YahooApiInterface();
             List<Stock> G = new List<Stock>();
             G.AddRange(F.getYahooData(new List<string>() { Tickers[i] }, new DateTime(2013, 01, 01)));
+            while (G[0].WeeklyHist == null || G[0].HourlyHist == null || G[0].DailyHist == null || G[0].MonthlyHist == null)
+            {
+                i = Tickers.IndexOf(G[0].StockName);
+                Tickers.Remove(G[0].StockName);
+                if (i == Tickers.Count) i = 0;
+                G = new List<Stock>();
+                G.AddRange(F.getYahooData(new List<string>() { Tickers[i] }, new DateTime(2013, 01, 01)));
+            }
 
             Cache[4] = Cache[3];
             Cache[3] = Cache[2];

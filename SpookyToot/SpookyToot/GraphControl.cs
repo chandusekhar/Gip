@@ -43,7 +43,7 @@ namespace SpookyToot
             CurrentStock = stk;
 
             CurrentOverlays = new ObservableCollection<GraphOverlays>();
-            if(CurrentStock.HourlyHist.Count >0) ModelViewHourly = GenerateGraph(CurrentStock, Stock.Interval.Hour);
+            if(CurrentStock.HourlyHist.Count > 0) ModelViewHourly = GenerateGraph(CurrentStock, Stock.Interval.Hour);
             if (CurrentStock.DailyHist.Count > 0) ModelViewDaily = GenerateGraph(CurrentStock, Stock.Interval.Day);
             if (CurrentStock.WeeklyHist.Count > 0) ModelViewWeekly = GenerateGraph(CurrentStock, Stock.Interval.Week);
             if (CurrentStock.MonthlyHist.Count > 0) ModelViewMonthly = GenerateGraph(CurrentStock, Stock.Interval.Month);
@@ -137,8 +137,8 @@ namespace SpookyToot
             // create visible window
             var Istart = length -10;
             var Iend = length -1;
-            var Ymin = series.Items.Skip(Istart).Take(Iend - Istart + 1).Select(x => x.Low).Min();
-            var Ymax = series.Items.Skip(Istart).Take(Iend - Istart + 1).Select(x => x.High).Max();
+            var Ymin = series.Items.Skip((int)endPOs).Take((int)startPost - (int)endPOs + 1).Select(x => x.Low).Min();
+            var Ymax = series.Items.Skip((int)endPOs).Take((int)startPost - (int)endPOs + 1).Select(x => x.High).Max();
 
             // setup axes
             var timeAxis = new OxyPlot.Axes.DateTimeAxis
@@ -155,7 +155,7 @@ namespace SpookyToot
             {
                 Position = AxisPosition.Left,
                 Key = series.BarAxisKey,
-                StartPosition = 0.25,
+                StartPosition = 0.35,
                 EndPosition = 1.0,
                 Minimum = naturalY ? double.NaN : Ymin,
                 Maximum = naturalY ? double.NaN : Ymax,
@@ -197,7 +197,6 @@ namespace SpookyToot
 
             pm.Series.Add(series);
 
-            AdjustYExtent(series,timeAxis,barAxis);
 
 
             if (naturalY == false)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -67,8 +68,19 @@ namespace SpookyToot
                 var d = Market.DataContext as MetaData;
 
                 c.update(d.Cache[1]);
-
                 d.LastTikker();
+
+                ThreadPool.QueueUserWorkItem(delegate (object state) {
+
+                    this.Dispatcher.BeginInvoke(new Action(() => {
+
+                    }));
+                });
+
+                DailyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewDaily.Model"));
+                dayShwoing = true;
+                WeeklyMonthlyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewWeekly.Model"));
+                WeekShowing = true;
 
                 WeeklyMonthlyView.Model.InvalidatePlot(true);
                 DailyView.Model.InvalidatePlot(true);
@@ -80,7 +92,23 @@ namespace SpookyToot
                 var d = Market.DataContext as MetaData;
 
                 c.update(d.Cache[3]);
-                d.NextTikker();
+
+                ThreadPool.QueueUserWorkItem(delegate (object state) {
+
+                    this.Dispatcher.BeginInvoke(new Action(() => {
+                        d.NextTikker();
+
+                    }));
+                });
+                
+
+                DailyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewDaily.Model"));
+                dayShwoing = true;
+                WeeklyMonthlyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewWeekly.Model"));
+                WeekShowing = true;
+
+                WeeklyMonthlyView.Model.InvalidatePlot(true);
+                DailyView.Model.InvalidatePlot(true);
 
             }
         }
