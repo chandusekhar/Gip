@@ -24,23 +24,35 @@ namespace SpookyToot
         public Example ModelViewHourly { get; private set; }
         public Example ModelViewDaily { get; private set; }
         public Example ModelViewWeekly { get; private set; }
-        public Example ModelViewMonthly{ get; private set; }
+        public Example ModelViewMonthly { get; private set; }
         public Stock CurrentStock { get; private set; }
+        public string Ticker { get; set; }
 
         public ObservableCollection<GraphOverlays> CurrentOverlays { get; private set; }
 
         public GraphControl()
         {
+            Ticker = "sgh.AX";
             YahooApiInterface T = new YahooApiInterface();
-            List<Stock> SGH = new List<Stock>( T.getYahooData(new List<string>() { "wow.AX" }, new DateTime(2013, 01, 01)));
+            List<Stock> SGH = new List<Stock>(T.getYahooData(new List<string>() { Ticker }, new DateTime(2013, 01, 01)));
+            update(SGH[0]);
+        }
 
-            CurrentStock = SGH[0];
+        public void update(Stock stk)
+        {
+            CurrentStock = stk;
 
             CurrentOverlays = new ObservableCollection<GraphOverlays>();
-            ModelViewHourly = GenerateGraph(CurrentStock, Stock.Interval.Hour);
-            ModelViewDaily = GenerateGraph(CurrentStock, Stock.Interval.Day);
-            ModelViewWeekly = GenerateGraph(CurrentStock, Stock.Interval.Week);
-            ModelViewMonthly = GenerateGraph(CurrentStock, Stock.Interval.Month);
+            if(CurrentStock.HourlyHist.Count >0) ModelViewHourly = GenerateGraph(CurrentStock, Stock.Interval.Hour);
+            if (CurrentStock.DailyHist.Count > 0) ModelViewDaily = GenerateGraph(CurrentStock, Stock.Interval.Day);
+            if (CurrentStock.WeeklyHist.Count > 0) ModelViewWeekly = GenerateGraph(CurrentStock, Stock.Interval.Week);
+            if (CurrentStock.MonthlyHist.Count > 0) ModelViewMonthly = GenerateGraph(CurrentStock, Stock.Interval.Month);
+
+            ModelViewHourly.Model.InvalidatePlot(true);
+            ModelViewDaily.Model.InvalidatePlot(true);
+            ModelViewWeekly.Model.InvalidatePlot(true);
+            ModelViewMonthly.Model.InvalidatePlot(true);
+
         }
 
 
@@ -94,7 +106,7 @@ namespace SpookyToot
             bool naturalY = false;
             bool naturalV = false;
 
-            var pm = new PlotModel {  };
+            var pm = new PlotModel {};
 
             var series = new CandleStickAndVolumeSeries
             {
@@ -107,7 +119,7 @@ namespace SpookyToot
                 VolumeStyle = VolumeStyle.Combined
             };
 
-    
+
             // create bars
             foreach (var v in TradingList)
             {
@@ -123,8 +135,8 @@ namespace SpookyToot
             }
 
             // create visible window
-            var Istart = length - 60;
-            var Iend = length+20;
+            var Istart = length -10;
+            var Iend = length -1;
             var Ymin = series.Items.Skip(Istart).Take(Iend - Istart + 1).Select(x => x.Low).Min();
             var Ymax = series.Items.Skip(Istart).Take(Iend - Istart + 1).Select(x => x.High).Max();
 
@@ -134,11 +146,11 @@ namespace SpookyToot
                 Position = AxisPosition.Bottom,
                 Minimum = endPOs,
                 Maximum = startPost,
-                
+
                 //StartPosition = Xmax - TimeSpan.FromDays(180).Ticks,
                 //EndPosition = Xmax,
             };
-  
+
             var barAxis = new OxyPlot.Axes.LogarithmicAxis()
             {
                 Position = AxisPosition.Left,
@@ -147,7 +159,7 @@ namespace SpookyToot
                 EndPosition = 1.0,
                 Minimum = naturalY ? double.NaN : Ymin,
                 Maximum = naturalY ? double.NaN : Ymax,
-               
+
             };
             var volAxis = new OxyPlot.Axes.LinearAxis()
             {
@@ -185,6 +197,9 @@ namespace SpookyToot
 
             pm.Series.Add(series);
 
+            AdjustYExtent(series,timeAxis,barAxis);
+
+
             if (naturalY == false)
             {
                 timeAxis.AxisChanged += (sender, e) => AdjustYExtent(series, timeAxis, barAxis);
@@ -202,12 +217,12 @@ namespace SpookyToot
 
             foreach (var f in TradingList)
             {
-                if (f.IsPivotHigh[0]) FirstOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.LawnGreen, X = f.Index, Y = f.High });
-                if (f.IsPivotHigh[1]) SecondOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Green, X = f.Index, Y = f.High });
-                if (f.IsPivotHigh[2]) ThirdOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.DarkGreen, X = f.Index, Y = f.High });
-                if (f.IsPivotLow[0]) FirstOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Pink, X = f.Index, Y = f.Low });
-                if (f.IsPivotLow[1]) SecondOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.Red, X = f.Index, Y = f.Low });
-                if (f.IsPivotLow[2]) ThirdOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() { Fill = OxyColors.DarkRed, X = f.Index, Y = f.Low });
+                if (f.IsPivotHigh[0]) FirstOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() {Fill = OxyColors.LawnGreen, X = f.Index, Y = f.High});
+                if (f.IsPivotHigh[1]) SecondOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() {Fill = OxyColors.Green, X = f.Index, Y = f.High});
+                if (f.IsPivotHigh[2]) ThirdOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() {Fill = OxyColors.DarkGreen, X = f.Index, Y = f.High});
+                if (f.IsPivotLow[0]) FirstOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() {Fill = OxyColors.Pink, X = f.Index, Y = f.Low});
+                if (f.IsPivotLow[1]) SecondOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() {Fill = OxyColors.Red, X = f.Index, Y = f.Low});
+                if (f.IsPivotLow[2]) ThirdOrderPivots.Add(new OxyPlot.Annotations.PointAnnotation() {Fill = OxyColors.DarkRed, X = f.Index, Y = f.Low});
             }
             ResistanceLines = MarketStructure.DefineSupportResistanceZonesPivots(Stck, Period);
 
@@ -238,7 +253,7 @@ namespace SpookyToot
             ///Adding line annotation...
 
 
-            var la = new OxyPlot.Annotations.LineAnnotation { Type = LineAnnotationType.Horizontal, Y = TradingList.Last().Close };
+            var la = new OxyPlot.Annotations.LineAnnotation {Type = LineAnnotationType.Horizontal, Y = TradingList.Last().Close};
             la.MouseDown += (s, e) =>
             {
                 if (e.ChangedButton != OxyMouseButton.Left)
@@ -286,7 +301,7 @@ namespace SpookyToot
                     {
                         if (e.HitTestResult.Element.GetType() == typeof(OxyPlot.Annotations.ArrowAnnotation))
                         {
-                            tmp = (OxyPlot.Annotations.ArrowAnnotation)e.HitTestResult.Element;
+                            tmp = (OxyPlot.Annotations.ArrowAnnotation) e.HitTestResult.Element;
                             pm.Annotations.Remove(tmp);
                             e.Handled = true;
                         }
@@ -302,7 +317,7 @@ namespace SpookyToot
                     // Modify the end point
                     tmp.EndPoint = timeAxis.InverseTransform(e.Position.X, e.Position.Y, barAxis);
                     tmp.FontWeight = FontWeights.Bold;
-                    tmp.Text = string.Format("{0:0.##}%", ((tmp.StartPoint.Y - tmp.EndPoint.Y) * -100) / tmp.StartPoint.Y);
+                    tmp.Text = string.Format("{0:0.##}%", ((tmp.StartPoint.Y - tmp.EndPoint.Y)*-100)/tmp.StartPoint.Y);
 
                     // Redraw the plot
                     pm.InvalidatePlot(false);
@@ -333,22 +348,22 @@ namespace SpookyToot
         private static void AdjustYExtent(CandleStickAndVolumeSeries series, OxyPlot.Axes.DateTimeAxis xaxis, OxyPlot.Axes.LogarithmicAxis yaxis)
         {
             var xmin = xaxis.ActualMinimum;
-            var xmax = xaxis.ActualMaximum ;
+            var xmax = xaxis.ActualMaximum;
 
             var istart = series.FindByX(xmin);
             var iend = series.FindByX(xmax);
 
             var ymin = double.MaxValue;
             var ymax = double.MinValue;
-            for (int i = istart; i < iend +1; i++)
+            for (int i = istart; i < iend + 1; i++)
             {
                 var bar = series.Items[i];
                 ymin = Math.Min(ymin, bar.Low);
                 ymax = Math.Max(ymax, bar.High);
             }
 
-            yaxis.Zoom(ymin * (0.999), ymax *1.001);
+            yaxis.Zoom(ymin*(0.999), ymax*1.001);
         }
     }
-    }
+}
 

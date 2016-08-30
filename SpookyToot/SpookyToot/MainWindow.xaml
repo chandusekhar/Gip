@@ -8,36 +8,45 @@
         mc:Ignorable="d"
         KeyDown="DailyView_OnKeyDown" 
         Title="MainWindow" Height="750" Width="1300">
-    <Window.DataContext>
-        <local:GraphControl/>
-    </Window.DataContext>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50*"/>
-            <ColumnDefinition Width="50*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height=" 90*"/>
-            <RowDefinition Height="10*"/>
-        </Grid.RowDefinitions>
+    <TabControl>
+        <TabItem Name="StockWindow" Header="Stock Window">
+            <TabItem.DataContext>
+                <local:GraphControl></local:GraphControl>
+            </TabItem.DataContext>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50*"/>
+                    <ColumnDefinition Width="50*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height=" 90*"/>
+                    <RowDefinition Height="10*"/>
+                </Grid.RowDefinitions>
 
-            <oxy:PlotView x:Name="DailyView" Background="AliceBlue" Model="{Binding ModelViewDaily.Model}" Controller="{Binding ModelViewDaily.Controller }" Grid.Row="0" Grid.Column="0" />
-        <oxy:PlotView x:Name="WeeklyMonthlyView" Background="AliceBlue"  Model="{Binding ModelViewWeekly.Model}" Controller="{Binding ModelViewWeekly.Controller }" Grid.Row="0" Grid.Column="1"/>
+                <oxy:PlotView x:Name="DailyView" Background="AliceBlue" Model="{Binding ModelViewDaily.Model}" Controller="{Binding ModelViewDaily.Controller }" Grid.Row="0" Grid.Column="0" />
+                <oxy:PlotView x:Name="WeeklyMonthlyView" Background="AliceBlue"  Model="{Binding ModelViewWeekly.Model}" Controller="{Binding ModelViewWeekly.Controller }" Grid.Row="0" Grid.Column="1"/>
 
-        <ItemsControl x:Name="PivotList" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"  ItemsSource="{Binding CurrentOverlays}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel x:Name="Stacky" Orientation="Horizontal" CanHorizontallyScroll="True"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <CheckBox Content="{Binding Name}"  IsChecked="{Binding Show}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" ></CheckBox>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+                <ItemsControl x:Name="PivotList" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"  ItemsSource="{Binding CurrentOverlays}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel x:Name="Stacky" Orientation="Horizontal" CanHorizontallyScroll="True"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox Content="{Binding Name}"  IsChecked="{Binding Show}" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" ></CheckBox>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
+            </Grid>
+        </TabItem>
 
-    </Grid>
-    
-</Window>
+        <TabItem Name="Market" Header="Market">
+            <TabItem.DataContext>
+                <local:MetaData></local:MetaData>
+            </TabItem.DataContext>
+            <Button Name="LoadMarket" Content="Load Market"></Button>
+        </TabItem>
+    </TabControl>
+    </Window>

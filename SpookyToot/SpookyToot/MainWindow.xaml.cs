@@ -25,16 +25,14 @@ namespace SpookyToot
         private bool WeekShowing = true;
         private bool dayShwoing = true;
 
-
         public MainWindow()
         {
             InitializeComponent();
-
         }
 
         private void DailyView_OnKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Space)
+            if (e.Key == Key.Space || e.Key == Key.S)
             {
                 if (dayShwoing)
                 {
@@ -49,7 +47,7 @@ namespace SpookyToot
                 DailyView.Model.InvalidatePlot(true);
 
             }
-            else if (e.Key == Key.Enter)
+            else if (e.Key == Key.Enter || e.Key == Key.D)
             {
                 if (WeekShowing)
                 {
@@ -63,7 +61,28 @@ namespace SpookyToot
                 }
                 WeeklyMonthlyView.Model.InvalidatePlot(true);
             }
-            
+            else if (e.Key == Key.A)
+            {
+                var c = StockWindow.DataContext as GraphControl;
+                var d = Market.DataContext as MetaData;
+
+                c.update(d.Cache[1]);
+
+                d.LastTikker();
+
+                WeeklyMonthlyView.Model.InvalidatePlot(true);
+                DailyView.Model.InvalidatePlot(true);
+
+            }
+            else if (e.Key == Key.F)
+            {
+                var c = StockWindow.DataContext as GraphControl;
+                var d = Market.DataContext as MetaData;
+
+                c.update(d.Cache[3]);
+                d.NextTikker();
+
+            }
         }
 
 

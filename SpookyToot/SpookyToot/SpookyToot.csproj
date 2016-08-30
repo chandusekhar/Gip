@@ -150,6 +150,7 @@
     <Compile Include="GraphOverlays.cs" />
     <Compile Include="Indicators.cs" />
     <Compile Include="MarketStructures.cs" />
+    <Compile Include="MetaData.cs" />
     <Compile Include="StockStructures.cs" />
     <Compile Include="YahooApiInterface.cs" />
     <Page Include="MainWindow.xaml">
