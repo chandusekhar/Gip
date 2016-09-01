@@ -155,7 +155,7 @@ namespace SpookyToot
             {
                 Position = AxisPosition.Left,
                 Key = series.BarAxisKey,
-                StartPosition = 0.35,
+                StartPosition = 0.15,
                 EndPosition = 1.0,
                 Minimum = naturalY ? double.NaN : Ymin,
                 Maximum = naturalY ? double.NaN : Ymax,
@@ -166,7 +166,7 @@ namespace SpookyToot
                 Position = AxisPosition.Left,
                 Key = series.VolumeAxisKey,
                 StartPosition = 0.0,
-                EndPosition = 0.22,
+                EndPosition = 0.15,
                 Minimum = naturalV ? double.NaN : 0,
                 Maximum = naturalV ? double.NaN : TradingList.Max(x => x.Volume)
             };
@@ -269,6 +269,7 @@ namespace SpookyToot
             la.MouseMove += (s, e) =>
             {
                 la.Y = la.InverseTransform(e.Position).Y;
+                la.Text = string.Format("{0:0.###}", la.Y);
                 pm.InvalidatePlot(false);
                 e.Handled = true;
             };

@@ -63,9 +63,10 @@ namespace SpookyToot
                                 break;
                         }
                     }
-                    catch
+                    catch(Exception ex)
                     {
-                       
+                        System.Windows.MessageBox.Show("Probably no interwebz..");
+                        
                     }
                 }
                 ReturnedStocks.Add(Temp);

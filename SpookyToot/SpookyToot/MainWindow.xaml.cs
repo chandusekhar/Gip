@@ -31,9 +31,9 @@ namespace SpookyToot
             InitializeComponent();
         }
 
-        private void DailyView_OnKeyDown(object sender, KeyEventArgs e)
+        private async void DailyView_OnKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Space || e.Key == Key.S)
+            if ( e.Key == Key.W)
             {
                 if (dayShwoing)
                 {
@@ -45,10 +45,10 @@ namespace SpookyToot
                     DailyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewDaily.Model"));
                     dayShwoing = true;
                 }
-                DailyView.Model.InvalidatePlot(true);
+                DailyView.Model.InvalidatePlot(false);
 
             }
-            else if (e.Key == Key.Enter || e.Key == Key.D)
+            else if (e.Key == Key.E)
             {
                 if (WeekShowing)
                 {
@@ -60,22 +60,20 @@ namespace SpookyToot
                     WeeklyMonthlyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewWeekly.Model"));
                     WeekShowing = true;
                 }
-                WeeklyMonthlyView.Model.InvalidatePlot(true);
+                WeeklyMonthlyView.Model.InvalidatePlot(false);
             }
-            else if (e.Key == Key.A)
+            else if (e.Key == Key.Q)
             {
                 var c = StockWindow.DataContext as GraphControl;
                 var d = Market.DataContext as MetaData;
 
-                c.update(d.Cache[1]);
+                while (d.Farback == null)
+                {
 
-                ThreadPool.QueueUserWorkItem(delegate (object state) {
+                }
 
-                    this.Dispatcher.BeginInvoke(new Action(() => {
-                        d.LastTikker();
-
-                    }));
-                });
+                d.Current = d.Back;
+                c.update(d.Current);
 
                 DailyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewDaily.Model"));
                 dayShwoing = true;
@@ -85,31 +83,48 @@ namespace SpookyToot
                 WeeklyMonthlyView.Model.InvalidatePlot(true);
                 DailyView.Model.InvalidatePlot(true);
 
+
+                await Task.Run(() =>
+                {
+                    d.LastTikker();
+            });
+
             }
-            else if (e.Key == Key.F)
+            else if (e.Key == Key.R)
             {
                 var c = StockWindow.DataContext as GraphControl;
                 var d = Market.DataContext as MetaData;
 
-                c.update(d.Cache[3]);
+                while (d.FarForward == null)
+                {
+                   
+                }
 
-                ThreadPool.QueueUserWorkItem(delegate (object state) {
-
-                    this.Dispatcher.BeginInvoke(new Action(() => {
-                        d.NextTikker();
-
-                    }));
-                });
-                
+                d.Current = d.Forward;
+                c.update(d.Current);
 
                 DailyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewDaily.Model"));
                 dayShwoing = true;
                 WeeklyMonthlyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewWeekly.Model"));
                 WeekShowing = true;
-
                 WeeklyMonthlyView.Model.InvalidatePlot(true);
                 DailyView.Model.InvalidatePlot(true);
 
+                await Task.Run(() =>
+                {
+                    d.NextTikker();
+                }
+            );
+
+            }
+            else if(e.Key == Key.Space)
+            {
+                DailyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewDaily.Model"));
+                dayShwoing = true;
+                WeeklyMonthlyView.SetBinding(PlotView.ModelProperty, new Binding("ModelViewWeekly.Model"));
+                WeekShowing = true;
+                WeeklyMonthlyView.Model.InvalidatePlot(true);
+                DailyView.Model.InvalidatePlot(true);
             }
         }
 

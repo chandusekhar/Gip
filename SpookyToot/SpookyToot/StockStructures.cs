@@ -134,7 +134,7 @@ namespace SpookyToot
             }
         }
 
-        public void BuildStockHist(StreamReader YahooData, string Ticker, Stock.Interval Period)
+        public async void BuildStockHist(StreamReader YahooData, string Ticker, Stock.Interval Period)
         {
             switch (Period)
             {
