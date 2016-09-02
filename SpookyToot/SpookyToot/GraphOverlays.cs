@@ -4,24 +4,45 @@ using System.Linq;
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading.Tasks;
+using OxyPlot.Annotations;
 
 namespace SpookyToot
 {
     
-    public class GraphOverlays 
+    public class Pivots 
     {
         public string Name { get; set; }
-        public bool Show { get;  set; }
-        public object Overlay { get; set; }
+        public bool Show { get; set; }
+        public List<PointAnnotation> Overlay { get; set; }
         public Stock.Interval Period { get; set; }
 
-        private void Draw(object sender, EventArgs e)
+        public void Calcultae(Stock Calculate)
         {
-            if (Show)
-            {
-               
-            }
+            Overlay = Calculate.GetPivots(Period);
+            var FirstOrderPivots = new List<OxyPlot.Annotations.PointAnnotation>();
+            var SecondOrderPivots = new List<OxyPlot.Annotations.PointAnnotation>();
+            var ThirdOrderPivots = new List<OxyPlot.Annotations.PointAnnotation>();
         }
-        
+
     }
+
+    public class Resistances
+    {
+        public Stock.Interval Period { get; set; }
+        public string Name { get; set; }
+        public bool Show { get; set; }
+        public List<LineAnnotation> ResistanceLine { get; set; }
+
+        public void Calcultae(Stock Calculate)
+        {
+            ResistanceLine = MarketStructure.DefineSupportResistanceZonesPivots(Calculate, Period);           
+        }
+
+        public Resistances()
+        {
+            
+        }
+
+    }
+
 }

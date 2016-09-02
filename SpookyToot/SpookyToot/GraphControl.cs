@@ -28,6 +28,7 @@ namespace SpookyToot
         public Stock CurrentStock { get; private set; }
         public string Ticker { get; set; }
 
+        public ObservableCollection<Resistances> SuppAndRes { get; set; }
         public ObservableCollection<GraphOverlays> CurrentOverlays { get; private set; }
 
         public GraphControl()
@@ -36,6 +37,7 @@ namespace SpookyToot
             YahooApiInterface T = new YahooApiInterface();
             List<Stock> SGH = new List<Stock>(T.getYahooData(new List<string>() { Ticker }, new DateTime(2013, 01, 01)));
             update(SGH[0]);
+            GenerateControls();
         }
 
         public void update(Stock stk)
@@ -48,13 +50,13 @@ namespace SpookyToot
             if (CurrentStock.WeeklyHist.Count > 0) ModelViewWeekly = GenerateGraph(CurrentStock, Stock.Interval.Week);
             if (CurrentStock.MonthlyHist.Count > 0) ModelViewMonthly = GenerateGraph(CurrentStock, Stock.Interval.Month);
 
+            GenerateControls();
+
             ModelViewHourly.Model.InvalidatePlot(true);
             ModelViewDaily.Model.InvalidatePlot(true);
             ModelViewWeekly.Model.InvalidatePlot(true);
             ModelViewMonthly.Model.InvalidatePlot(true);
-
         }
-
 
         public class Example
         {
@@ -363,6 +365,11 @@ namespace SpookyToot
             }
 
             yaxis.Zoom(ymin*(0.999), ymax*1.001);
+        }
+
+        public void GenerateControls()
+        {
+            
         }
     }
 }

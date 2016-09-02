@@ -14,66 +14,89 @@ namespace SpookyToot
     public class MetaData
     {
         public ObservableCollection<string> Tickers { get; set; }
-        public Stock Current { get; set; }
         public Stock Forward { get; set; }
-        public Stock FarForward { get; set; }
+        public Stock Current { get; set; }
         public Stock Back { get; set; }
-        public Stock Farback { get; set; }
 
-        public void NextTikker()
+        public async void NextTikker()
         {
-            string oldTick = FarForward.StockName;
-
-            Forward = FarForward;
-            Farback = Back;
+            string oldTick = Forward.StockName;
             Back = Current;
+            Current = Forward;
+            Forward = null;
 
-            FarForward = null;
-            int i = Tickers.IndexOf(oldTick) + 1;
-            if (i == Tickers.Count) i = 0;
-
-            YahooApiInterface F = new YahooApiInterface();
-            List<Stock> G = new List<Stock>();
-            G = F.getYahooData(new List<string>() { Tickers[i] }, new DateTime(2013, 01, 01));
-
-            while (G[0].WeeklyHist == null || G[0].HourlyHist == null || G[0].DailyHist == null || G[0].MonthlyHist == null)
+            await Task.Run(() =>
             {
-                i = Tickers.IndexOf(G[0].StockName);
-                Tickers.Remove(G[0].StockName);
+                YahooApiInterface F = new YahooApiInterface();
+                List<Stock> G = new List<Stock>();
+
+                int i = Tickers.IndexOf(oldTick) + 1;
                 if (i == Tickers.Count) i = 0;
-                G = new List<Stock>();
-                G.AddRange(F.getYahooData(new List<string>() { Tickers[i] }, new DateTime(2013, 01, 01)));
-            }
 
+                G = F.getYahooData(new List<string>() {Tickers[i]}, new DateTime(2013, 01, 01));
 
-            FarForward= G[0];
+                while (G[0].WeeklyHist == null || G[0].HourlyHist == null || G[0].DailyHist == null || G[0].MonthlyHist == null)
+                {
+                    i = Tickers.IndexOf(G[0].StockName);
+                    Tickers.Remove(G[0].StockName);
+                    if (i == Tickers.Count) i = 0;
+                    G = new List<Stock>();
+                    G.AddRange(F.getYahooData(new List<string>() {Tickers[i]}, new DateTime(2013, 01, 01)));
+                }
+                Forward = G[0];
+            });
         }
 
-        public void LastTikker()
+        public async void LastTikker()
         {
-            string oldTick = Farback.StockName;
-            
-            FarForward = Forward;
+            string oldTick = Back.StockName;
             Forward = Current;
-            Back = Farback;
-            Farback = null;
+            Current = Back;
+            Back = null;
 
-            int i = Tickers.IndexOf(oldTick) - 1;
-            if (i <0) i = Tickers.Count - 1;
-
-            YahooApiInterface F = new YahooApiInterface();
-            List<Stock> G = new List<Stock>();
-            G.AddRange(F.getYahooData(new List<string>() { Tickers[i] }, new DateTime(2013, 01, 01)));
-            while (G[0].WeeklyHist == null || G[0].HourlyHist == null || G[0].DailyHist == null || G[0].MonthlyHist == null)
+            await Task.Run(() =>
             {
-                i = Tickers.IndexOf(G[0].StockName);
-                Tickers.Remove(G[0].StockName);
-                if (i == Tickers.Count) i = 0;
-                G = new List<Stock>();
-                G.AddRange(F.getYahooData(new List<string>() { Tickers[i] }, new DateTime(2013, 01, 01)));
+                YahooApiInterface F = new YahooApiInterface();
+                List<Stock> G = new List<Stock>();
+
+                int i = Tickers.IndexOf(oldTick) - 1;
+                if (i < 0) i = Tickers.Count - 1;
+
+                G.AddRange(F.getYahooData(new List<string>() {Tickers[i]}, new DateTime(2013, 01, 01)));
+                while (G[0].WeeklyHist == null || G[0].HourlyHist == null || G[0].DailyHist == null || G[0].MonthlyHist == null)
+                {
+                    i = Tickers.IndexOf(G[0].StockName);
+                    Tickers.Remove(G[0].StockName);
+                    if (i == Tickers.Count) i = 0;
+                    G = new List<Stock>();
+                    G.AddRange(F.getYahooData(new List<string>() {Tickers[i]}, new DateTime(2013, 01, 01)));
+                }
+                Back = G[0];
+            });
+        }
+
+        public Stock GetGtraph(bool goforward)
+        {
+            Stock ReturnItem = null;
+
+            if (goforward)
+            {
+                if (Forward != null && Back != null)
+                {
+                    ReturnItem = Forward;
+                    NextTikker();
+                }
+            }
+            else
+            {
+                if (Forward != null && Back != null)
+                {
+                    ReturnItem = Back;
+                    LastTikker();
+                }
             }
 
-            Farback = G[0];
+            return ReturnItem;
         }
 
         public MetaData()
@@ -84,32 +107,34 @@ namespace SpookyToot
 
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.DefaultExt = ".csv";
-            Nullable<bool> result = dlg.ShowDialog();
-            Stocklist = dlg.FileName;
-
-            if (File.Exists(Stocklist))
+            bool? result = dlg.ShowDialog();
+            if (dlg.FileName != null)
             {
-                BackUpData(Stocklist);
+                Stocklist = dlg.FileName;
 
-                using (Stream stream = File.Open(Stocklist, FileMode.Open))
+                if (File.Exists(Stocklist))
                 {
-                    var p = new StreamReader(stream);
-                    while (!p.EndOfStream)
+                    BackUpData(Stocklist);
+
+                    using (Stream stream = File.Open(Stocklist, FileMode.Open))
                     {
-                        var c = p.ReadLine();
-                        c = c + ".AX";
-                        Tickers.Add(c);
+                        var p = new StreamReader(stream);
+                        while (!p.EndOfStream)
+                        {
+                            var c = p.ReadLine();
+                            c = c + ".AX";
+                            Tickers.Add(c);
+                        }
                     }
                 }
-            }
-            YahooApiInterface F = new YahooApiInterface();
-            Cache.AddRange(F.getYahooData(new List<string>() { Tickers[Tickers.Count - 2], Tickers[Tickers.Count - 1], Tickers[0], Tickers[1], Tickers[2] }, new DateTime(2013, 01, 01)));
+                YahooApiInterface F = new YahooApiInterface();
+                Cache.AddRange(F.getYahooData(new List<string>() { Tickers[Tickers.Count - 1], Tickers[0], Tickers[1] }, new DateTime(2013, 01, 01)));
 
-            Farback = Cache[0];
-            Back = Cache[1];
-            Current = Cache[2];
-            Forward = Cache[3];
-            FarForward = Cache[4];
+                Back = Cache[0];
+                Current = Cache[1];
+                Forward = Cache[2]; 
+            }
+
         }
 
         public void LoadData(string path)
@@ -132,13 +157,12 @@ namespace SpookyToot
                 }
             }
             YahooApiInterface F = new YahooApiInterface();
-            Cache.AddRange(F.getYahooData(new List<string>() { Tickers[Tickers.Count - 2], Tickers[Tickers.Count - 1], Tickers[0], Tickers[1], Tickers[2] }, new DateTime(2013, 01, 01)));
+            Cache.AddRange(F.getYahooData(new List<string>() {  Tickers[Tickers.Count - 1], Tickers[0], Tickers[1] }, new DateTime(2013, 01, 01)));
 
-            Farback = Cache[0];
-            Back = Cache[1];
-            Current = Cache[2];
-            Forward = Cache[3];
-            FarForward = Cache[4];
+            Back = Cache[0];
+            Current = Cache[1];
+            Forward = Cache[2];
+
         }
 
         public void BackUpData(string path)
